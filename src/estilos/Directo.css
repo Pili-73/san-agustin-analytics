@@ -1,0 +1,234 @@
+@import "./comun.css";
+
+/* Columna: el marcador ocupa su alto natural y el resto (directo__contenido)
+   se queda con justo lo que sobra, sea cual sea la altura real del marcador. */
+.partido-directo { display: flex; flex-direction: column; height: 100dvh; background: var(--color-fondo); }
+
+/* --- Marcador --- */
+/* Fijo arriba: en móvil, al hacer scroll hasta la situación ofensiva, el marcador sigue visible. */
+.marcador-bar { flex-shrink: 0; position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 12px clamp(12px, 2vw, 28px); background: var(--color-fondo); border-bottom: 1px solid #e8e8e8; }
+.marcador-bar__parte { padding: 6px 12px; border-radius: 20px; background: var(--color-gris-claro); color: var(--color-texto-suave); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.marcador { display: flex; position: relative; justify-content: center; align-items: center; gap: clamp(6px, 1.5vw, 16px); }
+.marcador--boton { width: 100%; padding: 10px; border: 0; border-radius: 12px; background: transparent; cursor: pointer; }
+.marcador--boton:hover { background: #f7f7f7; }
+.equipo-nombre { font-size: clamp(1rem, 2.1vw, 1.55rem); font-weight: 700; }
+.goles, .timer { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; }
+.timer { padding: 0 10px; border-inline: 1px solid #ddd; }
+.marcador__tiempo-muerto { position: absolute; right: 3px; top: -7px; padding: 2px 5px; border-radius: 5px; background: var(--color-rojo-malo); color: #fff; font-size: .7rem; font-weight: 800; }
+.marcador-bar__ayuda { color: #666; font-size: .8rem; text-align: right; }
+
+/* --- Layout: la plantilla se queda siempre a la izquierda --- */
+/* flex: 1 (no una resta fija de píxeles): ocupa exactamente lo que el
+   marcador deja libre, así el panel entero cabe sin bajar con el ratón. */
+.directo__contenido { display: grid; grid-template-columns: minmax(150px, 26%) 1fr; flex: 1; min-height: 0; }
+.plantilla-directo { display: flex; flex-direction: column; min-height: 0; padding: 18px 10px; background: #fafafa; border-right: 1px solid #ddd; overflow-y: auto; }
+.plantilla-directo h2 { margin: 0 0 12px; font-size: 1.1rem; }
+.lista-directo { display: flex; flex-direction: column; }
+.lista-directo h3 { min-height: 18px; margin: 0 0 7px; color: #666; font-size: .74rem; text-transform: uppercase; }
+
+.jugador-directo { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px; margin-bottom: 7px; border-radius: 8px; background: var(--color-rojo); color: #fff; overflow: hidden; transition: opacity 0.15s ease, outline-color 0.1s ease; }
+.jugador-directo--portero { background: var(--color-amarillo); color: #342806; }
+.jugador-directo.is-selected { outline: 3px solid #222; }
+.jugador-directo.is-arrastrando { opacity: .35; }
+.jugador-directo.drop-antes { box-shadow: inset 0 3px 0 0 #222; }
+.jugador-directo.drop-despues { box-shadow: inset 0 -3px 0 0 #222; }
+.jugador-directo__nombre { min-width: 0; padding: 9px 6px; border: 0; background: transparent; color: inherit; cursor: pointer; font-family: var(--fuente); font-size: .88rem; font-weight: 700; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jugador-directo__nombre strong { display: inline-block; width: 22px; }
+.jugador-directo__asa { display: flex; align-items: center; justify-content: center; min-width: 30px; min-height: 30px; margin-right: 3px; border: 0; border-radius: 4px; background: rgb(255 255 255 / 22%); color: inherit; font-size: 1.1rem; line-height: 1; cursor: grab; touch-action: none; user-select: none; }
+.jugador-directo__asa:active { cursor: grabbing; background: rgb(255 255 255 / 40%); }
+
+.plantilla-directo__separador { margin: 16px 0 10px; border-block: 2px solid #555; padding: 6px; color: #555; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-align: center; }
+.lista-directo__vacia { margin: 8px 0; color: #777; font-size: .82rem; font-style: italic; }
+.lista-directo__final { min-height: 10px; }
+.lista-directo__final.drop-al-final { border-radius: 4px; background: repeating-linear-gradient(45deg, #999, #999 4px, transparent 4px, transparent 8px); }
+
+/* --- Panel principal --- */
+/* min-height: 0 es necesario para que, siendo un hijo de grid con altura
+   fija, pueda encogerse de verdad en vez de desbordar. overflow-y: auto queda
+   solo como red de seguridad en ventanas muy bajas. */
+.panel-directo { display: flex; min-width: 0; min-height: 0; flex-direction: column; gap: 14px; padding: clamp(12px, 2vw, 24px); overflow-y: auto; }
+
+.tipos-defensa { display: flex; flex-shrink: 0; justify-content: center; gap: 14px; }
+.tipos-defensa__pill { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border: 2px solid; border-radius: 24px; font-size: .8rem; font-weight: 700; }
+.tipos-defensa__pill select { min-height: 34px; padding: 0 8px; border: 0; border-radius: 18px; background: #fff; font: 700 .85rem/1 var(--fuente); }
+.tipos-defensa__pill--propia { border-color: var(--color-rojo); color: var(--color-rojo-oscuro); }
+.tipos-defensa__pill--rival { border-color: var(--color-azul); color: var(--color-azul-oscuro); }
+
+/* flex: 1 en los botones (no un ancho mínimo fijo) para que las tres
+   cards siempre quepan exactamente en el ancho del panel, sea cual sea la
+   pantalla, sin invadir el lateral de jugadores. */
+.acciones-lanzamiento { display: flex; flex-shrink: 0; justify-content: center; gap: 12px; }
+.acciones-lanzamiento button { flex: 1 1 0; min-width: 0; min-height: 48px; border: 0; border-radius: 9px; color: #fff; cursor: pointer; font-family: var(--fuente); font-size: 1.05rem; font-weight: 800; }
+.acciones-lanzamiento__gol { background: var(--color-verde); }
+.acciones-lanzamiento__par { background: var(--color-azul); }
+.acciones-lanzamiento__fue { background: var(--color-rojo-malo); }
+.acciones-lanzamiento button:disabled { opacity: .4; cursor: not-allowed; }
+/* La copia flotante (dentro de zona-juego) solo se usa en pantallas anchas
+   y bajas; el resto del tiempo se oculta y manda la fila normal. */
+.acciones-lanzamiento--flotante { display: none; }
+
+/* La portería se encoge o crece para llenar justo el hueco que dejan el
+   resto de elementos (flex-grow), en vez de fijar su tamaño por anchura:
+   así el panel entero cabe en la pantalla sin hacer scroll. */
+.zona-juego { position: relative; flex: 1 1 0; min-height: 140px; align-self: center; width: auto; max-width: min(100%, 850px); aspect-ratio: 858 / 1024; overflow: hidden; border-radius: 12px; box-shadow: 0 2px 9px rgb(0 0 0 / 18%); }
+.zona-juego > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.selector-cuadrantes { position: absolute; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+.selector-cuadrantes--porteria { top: 15.7%; left: 15%; width: 70%; height: 37%; }
+.selector-cuadrantes--lanz { bottom: 1.5%; left: 0; width: 100%; height: 39%; }
+.selector-cuadrantes button { border: 1px solid rgb(255 255 255 / 70%); background: rgb(255 255 255 / 1%); color: transparent; cursor: pointer; }
+.selector-cuadrantes button:hover { background: rgb(255 255 255 / 28%); }
+.selector-cuadrantes button.is-selected { background: rgb(216 67 62 / 58%); box-shadow: inset 0 0 0 3px #fff; }
+.selector-zonas-lanz { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.selector-zonas-lanz polygon { cursor: pointer; fill: transparent; pointer-events: all; stroke: transparent; stroke-width: .7; }
+.selector-zonas-lanz polygon:hover { fill: rgb(255 255 255 / 24%); stroke: rgb(255 255 255 / 75%); }
+.selector-zonas-lanz polygon.is-selected { fill: rgb(216 67 62 / 58%); stroke: #fff; stroke-width: 1.2; }
+
+/* Portero seleccionado: las zonas se resaltan en amarillo en vez de rojo. */
+.zona-juego--portero .selector-cuadrantes button.is-selected { background: rgb(239 189 36 / 62%); }
+.zona-juego--portero .selector-zonas-lanz polygon.is-selected { fill: rgb(239 189 36 / 62%); }
+
+/* --- Ataque / Defensa / Sanciones (desplegables) --- */
+.acciones-jugador { flex-shrink: 0; padding: 12px; border-radius: 12px; background: #f3f3f3; }
+.acciones-jugador__cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-bottom: 10px; }
+.acciones-jugador p { min-height: 20px; margin: 0; font-weight: 700; }
+.acciones-jugador__estado { display: flex; align-items: center; gap: 8px; }
+
+.badge-pendientes { padding: 4px 9px; border-radius: 20px; background: var(--color-amarillo); color: var(--color-texto); font-size: .74rem; font-weight: 800; white-space: nowrap; }
+
+.btn-deshacer { flex-shrink: 0; padding: 6px 12px; border: 0; border-radius: 20px; background: var(--color-gris); color: #fff; font-family: var(--fuente); font-size: .8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.btn-deshacer:disabled { opacity: .5; cursor: not-allowed; }
+.btn-deshacer:hover:not(:disabled) { background: var(--color-texto-suave); }
+/* Ataque y Defensa arriba, Sanciones centrada debajo de ambas: las 3 quedan
+   a media anchura del panel en vez de a un tercio, así los desplegables
+   tienen sitio de sobra. */
+.acciones-jugador__grupos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.grupo-accion--atq { grid-area: 1 / 1 / 2 / 3; }
+.grupo-accion--def { grid-area: 1 / 3 / 2 / 5; }
+.grupo-accion--san { grid-area: 2 / 2 / 3 / 4; }
+.grupo-accion { position: relative; border-radius: 8px; overflow: visible; }
+.grupo-accion__cabecera { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 43px; border: 0; border-radius: 8px; cursor: pointer; font-family: var(--fuente); font-size: 1rem; font-weight: 800; }
+.grupo-accion__cabecera:disabled { opacity: .45; cursor: not-allowed; }
+.grupo-accion__flecha { font-size: .65rem; }
+.grupo-accion--atq .grupo-accion__cabecera { background: var(--color-rojo); color: #fff; }
+.grupo-accion--def .grupo-accion__cabecera { background: var(--color-azul); color: #fff; }
+.grupo-accion--san .grupo-accion__cabecera { background: var(--color-gris); color: #fff; }
+/* Lista vertical de cards sueltas (sin contenedor que las englobe), con hueco
+   entre ellas; misma anchura que el botón del grupo. Puede crecer hasta
+   solaparse con la portería si hace falta (no se recorta con scroll). */
+/* z-index por encima del marcador (que es sticky) para que un desplegable
+   largo no quede tapado si aún no se ha bajado la página. */
+.grupo-accion__opciones { position: absolute; z-index: 25; bottom: calc(100% + 8px); left: 0; max-width: 100%; display: flex; flex-direction: column; width: 100%; gap: 8px; box-sizing: border-box; }
+/* min-width: 0 y overflow-wrap: la etiqueta ("Intercepción", "Infracción"...)
+   nunca debe forzar el botón a ser más ancho que la columna, ni siquiera si
+   es una sola palabra larga sin espacios donde partir línea. */
+/* Fondo grisáceo (no blanco) para que la card se distinga del blanco del
+   resto de la pantalla cuando queda flotando por encima. */
+.grupo-accion__opciones button { width: 100%; min-width: 0; box-sizing: border-box; display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 9px 14px; border: 0; border-radius: 10px; background: var(--color-gris-claro); box-shadow: 0 2px 8px rgb(0 0 0 / 18%); cursor: pointer; font-size: .88rem; font-weight: 700; text-align: left; }
+/* flex: 1 + min-width: 0 de verdad (no un nodo de texto suelto) para que la
+   etiqueta se encoja y parta línea si hace falta, en vez de salirse del botón. */
+.grupo-accion__texto { flex: 1 1 0; min-width: 0; overflow-wrap: break-word; }
+.grupo-accion__opciones button:hover { background: #ddd; }
+@media (min-width: 761px) {
+  .grupo-accion__opciones button { min-height: 48px; padding: 10px 16px; font-size: 1.05rem; }
+}
+.indicador-color { width: 14px; height: 14px; flex: 0 0 14px; border: 1px solid #777; border-radius: 50%; }
+.indicador-color--rojo { background: var(--color-rojo); }
+.indicador-color--malo { background: var(--color-rojo-malo); }
+.indicador-color--blanco { background: #fff; }
+.indicador-color--verde { background: var(--color-verde); }
+.indicador-color--amarillo { background: var(--color-amarillo); }
+.indicador-color--azul { background: var(--color-azul); }
+.indicador-color--gris { background: var(--color-gris); }
+
+/* Iconos de sanción: gesto de 2 dedos (2 min) y tarjeta (amarilla/roja/azul). */
+.icono-2min { flex: 0 0 auto; font-size: 1.15rem; line-height: 1; }
+.icono-tarjeta { width: 11px; height: 15px; flex: 0 0 11px; border: 1px solid #777; border-radius: 2px; }
+.icono-tarjeta--amarillo { background: var(--color-amarillo); }
+.icono-tarjeta--rojo { background: var(--color-rojo); }
+.icono-tarjeta--azul { background: var(--color-azul); }
+
+/* --- Situación ofensiva (7m a media anchura) --- */
+.situaciones { display: grid; flex-shrink: 0; grid-template-columns: repeat(4, 1fr) 0.55fr; gap: 8px; align-items: end; }
+.situaciones button { min-width: 0; padding: 5px; border: 2px solid transparent; border-radius: 8px; background: #f5f5f5; cursor: pointer; }
+.situaciones button.is-selected { border-color: var(--color-rojo); background: var(--color-rojo-claro); }
+.situaciones img { display: block; width: 100%; height: 66px; object-fit: cover; border-radius: 5px; }
+.situaciones span { display: block; margin-top: 4px; font-size: .76rem; font-weight: 700; }
+
+/* --- Menú del cronómetro --- */
+.menu-marcador { display: grid; gap: 8px; }
+.menu-marcador button { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px; border: 0; border-radius: 9px; background: #f0f0f0; cursor: pointer; font-family: var(--fuente); font-size: .95rem; font-weight: 700; }
+.menu-marcador button span { font-size: 1.1rem; }
+.menu-marcador button:hover { background: #e6e6e6; }
+.menu-marcador__parte { background: var(--color-azul-claro); color: var(--color-azul-oscuro); }
+.menu-marcador__parte:hover { background: #c9e2f9; }
+.menu-marcador__peligro { margin-top: 6px; background: var(--color-rojo-claro); color: var(--color-rojo-malo); }
+.menu-marcador__peligro:hover { background: #fbd0cd; }
+
+@media (max-width: 760px) {
+  /* Sin "ayuda" (oculta) solo quedan parte + marcador: caben los dos en la
+     misma fila con el reparto de columnas normal, sin forzar el marcador a
+     ocupar toda la fila (eso empujaba "1ª parte" a una fila aparte). */
+  .marcador-bar { grid-template-columns: auto 1fr; padding: 8px clamp(10px, 3vw, 20px); }
+  .marcador-bar__ayuda { display: none; }
+
+  /* El móvil también debe caber entero en la pantalla: mismo mecanismo que
+     escritorio (portería con flex-grow), pero con contenedores más
+     compactos (menos hueco, letra más pequeña) para que quepa todo. */
+  .directo__contenido { grid-template-columns: minmax(120px, 32%) 1fr; }
+  .panel-directo { gap: 8px; padding: 8px; }
+  .tipos-defensa { gap: 8px; }
+  .tipos-defensa__pill { padding: 4px 6px 4px 10px; font-size: .72rem; }
+  .tipos-defensa__pill select { min-height: 28px; }
+  .acciones-lanzamiento { gap: 8px; }
+  .acciones-lanzamiento button { min-height: 38px; font-size: .88rem; }
+  .zona-juego { min-height: 100px; }
+  .acciones-jugador { padding: 8px; }
+  .acciones-jugador p { min-height: 0; margin: 0; font-size: .82rem; }
+  .acciones-jugador__cabecera { margin-bottom: 6px; }
+  .badge-pendientes, .btn-deshacer { font-size: .68rem; padding: 4px 8px; }
+  .acciones-jugador__grupos { gap: 6px; }
+  .grupo-accion__cabecera { min-height: 34px; font-size: .74rem; gap: 3px; }
+  .situaciones { gap: 5px; }
+  .situaciones button { padding: 3px; }
+  .situaciones img { height: 32px; }
+  .situaciones span { font-size: .62rem; margin-top: 2px; }
+
+  /* Nombres completos en dos líneas en vez de recortados: en una columna tan
+     estrecha, cortar con puntos suspensivos deja el nombre irreconocible. */
+  .jugador-directo__nombre { font-size: .78rem; padding: 6px 4px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; }
+  .jugador-directo__nombre strong { width: 15px; }
+  .jugador-directo__asa { min-width: 26px; min-height: 26px; }
+}
+
+/* Móviles muy estrechos: un pelín más compacto todavía. */
+@media (max-width: 400px) {
+  .directo__contenido { grid-template-columns: minmax(104px, 30%) 1fr; }
+  .zona-juego { min-height: 80px; }
+  .grupo-accion__cabecera { font-size: .68rem; padding: 0 4px; }
+  .tipos-defensa__pill { font-size: .66rem; padding: 3px 5px 3px 8px; }
+  .situaciones img { height: 26px; }
+}
+
+/* Tablet horizontal y ordenador: pantalla más ancha que alta, así que la
+   portería tiende a quedar pequeña (su tamaño depende del alto disponible).
+   Gol/Parada/Fuera se superponen al hueco vacío de arriba de la imagen (antes
+   de que empiece la zona de portería, al 15.7%) en vez de ocupar su propia
+   fila, liberando ese alto para que la portería crezca más. */
+@media (orientation: landscape) and (min-width: 1000px) {
+  .acciones-lanzamiento--flujo { display: none; }
+  /* Alto en % (no en px) de la propia zona-juego (su contenedor de
+     posicionamiento): así el hueco que deja libre siempre queda por encima
+     del 15.7% donde empieza la zona de portería, sea cual sea el tamaño
+     real de la imagen en cada pantalla. */
+  .acciones-lanzamiento--flotante {
+    display: flex;
+    position: absolute;
+    z-index: 4;
+    top: 2%;
+    left: 8%;
+    right: 8%;
+    height: 11%;
+    gap: 6px;
+  }
+  .acciones-lanzamiento--flotante button { min-height: 0; height: 100%; padding: 0 4px; font-size: .74rem; }
+}

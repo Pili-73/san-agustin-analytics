@@ -1,0 +1,178 @@
+
+/* Estilos de piezas/comun: se usan desde varias vistas */
+
+/* --- Campo (label + input/select) --- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1rem;
+}
+
+.campo span {
+  color: var(--color-texto);
+  font-weight: 700;
+}
+
+.campo select,
+.campo input {
+  width: 100%;
+  height: 52px;
+  padding: 0 14px;
+  color: var(--color-texto);
+  font-family: var(--fuente);
+  font-size: 1.05rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.campo input[type="date"],
+.campo input[type="time"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- BotonVolver --- */
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-gris-claro);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-volver:hover {
+  background: var(--color-rojo-claro);
+}
+
+.btn-volver__icono {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* --- Estado de carga / error, común a las pantallas con listados --- */
+.estado-carga {
+  padding: 28px 0;
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.texto-error {
+  color: var(--color-rojo-malo);
+}
+
+/* --- Toast --- */
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #323232;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  z-index: 40;
+  animation: toast-fade 3s forwards;
+}
+
+.toast--ok { background: var(--color-verde); }
+.toast--pendiente { background: var(--color-amarillo); color: var(--color-texto); }
+.toast--error { background: var(--color-rojo-malo); }
+
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* --- Modal --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: min(360px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.modal h2 {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+}
+
+.modal-campos {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-campos label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.modal-campos input {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0 10px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.modal-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-botones button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #eee;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-botones .btn-primario {
+  background: var(--color-rojo);
+  color: #fff;
+}

@@ -1,0 +1,64 @@
+@import "./comun.css";
+
+.vista-jugadores { max-width: 760px; min-height: 100dvh; margin: 0 auto; padding: 20px; }
+/* flex-wrap: en pantallas estrechas el botón de añadir no cabe junto al
+   título sin aplastarlo, así que baja a su propia línea. */
+.vista-jugadores__cabecera { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.vista-jugadores__cabecera h1, .vista-jugadores__cabecera p { margin: 0; }
+.vista-jugadores__cabecera h1 { color: var(--color-texto); }
+.vista-jugadores__cabecera p { margin-top: 6px; color: var(--color-texto-suave); }
+.vista-jugadores__cabecera > div { flex: 1; }
+
+.btn-anadir-jugador {
+  align-self: center;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-rojo);
+  color: #fff;
+  font-family: var(--fuente);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lista-jugadores { display: grid; gap: 10px; margin: 28px 0 0; padding: 0; list-style: none; }
+.lista-jugadores li { display: grid; grid-template-columns: 48px 1fr auto auto; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; background: var(--color-rojo-claro); }
+.lista-jugadores strong { color: var(--color-rojo-oscuro); font-size: 1.25rem; text-align: center; }
+.lista-jugadores small { color: var(--color-texto-suave); }
+.lista-jugadores .lista-jugadores__vacia { display: block; grid-template-columns: unset; text-align: center; background: transparent; color: var(--color-texto-suave); }
+
+.lista-jugadores__baja { background: var(--color-gris-claro); opacity: 0.75; }
+.lista-jugadores__baja strong { color: var(--color-texto-suave); }
+
+.etiqueta-baja {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-gris);
+  color: #fff;
+  font-size: 0.65rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.lista-jugadores__acciones { display: flex; gap: 6px; }
+.lista-jugadores__acciones button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.lista-jugadores__acciones .btn-eliminar { color: var(--color-rojo-malo); }
+.lista-jugadores__acciones .btn-reactivar { color: var(--color-verde); font-weight: 800; }
+.lista-jugadores__acciones button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.form-jugador { display: grid; gap: 14px; }
+.form-jugador__fila { display: flex; gap: 14px; }
+.form-jugador__fila .campo { flex: 1; min-width: 0; }

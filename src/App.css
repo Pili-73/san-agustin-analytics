@@ -1,0 +1,20 @@
+@import "./estilos/tokens.css";
+
+:root {
+  font-family: var(--fuente);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+

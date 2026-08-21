@@ -1,0 +1,68 @@
+@import "./comun.css";
+
+.preparar-partido {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.preparar-partido__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.preparar-partido__header h1 {
+  color: var(--color-texto);
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.preparar-partido__form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.tarjeta-formulario {
+  padding: clamp(20px, 4vw, 36px);
+  border-radius: 18px;
+  background: var(--color-rojo-claro);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 10%);
+}
+
+.preparar-partido__form .campo input[readonly] {
+  color: var(--color-texto-suave);
+  background: #f4f4f4;
+  cursor: default;
+}
+
+.preparar-partido__form .campo-fila {
+  display: flex;
+  gap: 16px;
+}
+
+.preparar-partido__form .campo-fila .campo {
+  flex: 1;
+  min-width: 0;
+}
+
+.preparar-partido__iniciar {
+  height: 60px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--color-rojo);
+  color: #fff;
+  font-family: var(--fuente);
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.preparar-partido__iniciar:disabled {
+  background: #f4a49c;
+  cursor: not-allowed;
+}

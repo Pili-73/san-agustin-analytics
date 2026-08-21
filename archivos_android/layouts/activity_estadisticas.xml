@@ -1,0 +1,1169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EstadisticasActivity">
+
+    <Button
+        android:id="@+id/btnFin"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:backgroundTint="#D1CFCF"
+        android:text="Fin partido"
+        android:textColor="#525252"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/nombreAgustinos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:text="Agustinos"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/golesAgustinos"
+        app:layout_constraintStart_toEndOf="@+id/btnFin"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/golesAgustinos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="109dp"
+        android:inputType="number"
+        android:text="0"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/btnPause"
+        app:layout_constraintStart_toEndOf="@+id/nombreAgustinos"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnPause"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:padding="0dp"
+        android:text="||"
+        android:textColor="#040404"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/tvTimer"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingTop="5dp"
+        android:text="00:00"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toStartOf="@+id/btnGuardar"
+        app:layout_constraintStart_toEndOf="@+id/btnFin"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnPlay"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:padding="0dp"
+        android:text="▶️"
+        android:textColor="#040404"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/tvTimer"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/golesRival"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="145dp"
+        android:inputType="number"
+        android:text="0"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/nombreRival"
+        app:layout_constraintStart_toEndOf="@+id/btnPlay"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/nombreRival"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginStart="280dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="132dp"
+        android:text="Rival"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/btnGuardar"
+        app:layout_constraintStart_toEndOf="@+id/golesRival"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnGuardar"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:backgroundTint="#D1CFCF"
+        android:text="Guardar"
+        android:textColor="#525252"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/headerHoja"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/header_neutral"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnGuardar">
+
+        <Button
+            android:id="@+id/btnAtaque"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:backgroundTint="#F25F5F"
+            android:text="ATAQUE"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/btnDefensa"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_weight="1"
+            android:backgroundTint="#3C5FEF"
+            android:text="DEFENSA"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <!-- containerAtaque !-->
+    <LinearLayout
+        android:id="@+id/containerAtaque"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerHoja">
+
+        <!-- tipoAtaque !-->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTipoAtaque"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:orientation="horizontal"
+            android:spacing="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAtPosicional"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Posicional"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_ataque_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAtContraataque"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Contraataque"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_ataque_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAtContragol"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Contragol"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_ataque_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+        <!-- defensaRival !-->
+        <LinearLayout
+            android:id="@+id/containerAtPosicional"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleAtFormacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="horizontal"
+                android:spacing="20dp"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAt60"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="6:0"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_ataque_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAt51"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="5:1"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_ataque_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAt33"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="3:3"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_ataque_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <!-- SitOfensiva !-->
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleAtSitOfensiva"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAt2v2"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="2v2"
+                        android:textAllCaps="false"
+                        android:textColor="@drawable/toggle_ataque_text"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAt1v1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1v1"
+                        android:textAllCaps="false"
+                        android:textColor="@drawable/toggle_ataque_text"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <!-- 2v2 !-->
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleSitAt2v2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:orientation="horizontal"
+                        android:spacing="15dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAtExterior"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Exterior"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_ataque_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAtCentro"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Centro"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_ataque_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                    <!-- Sit1v1 !-->
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleSitAt1v1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:orientation="horizontal"
+                        android:spacing="15dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAtFuerte"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Fuerte"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_ataque_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAtDébil"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Débil"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_ataque_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- tipoContra !-->
+        <LinearLayout
+            android:id="@+id/containerAtContraataque"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleAtTipoContra"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="horizontal"
+                android:spacing="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAt1ol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="1ª oleada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_ataque_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAt2ol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="2ª oleada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_ataque_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAt3ol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="3ª oleada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_ataque_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_ataque_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- containerDefensa !-->
+    <LinearLayout
+        android:id="@+id/containerDefensa"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerHoja">
+
+        <!-- tipoAtaque !-->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTipoDefensa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:orientation="horizontal"
+            android:spacing="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDefPosicional"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Posicional"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@drawable/toggle_defensa_text"
+                app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRepliegue"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Repliegue"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_defensa_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDefContragol"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Contragol"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_defensa_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+        <!-- tipoDefensa !-->
+        <LinearLayout
+            android:id="@+id/containerDefPosicional"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleDefFormacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:orientation="horizontal"
+                android:spacing="20dp"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDef60"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="6:0"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_defensa_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDef51"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="5:1"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_defensa_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDef33"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="3:3"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_defensa_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <!-- SitOfensiva !-->
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleDefSitOfensiva"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDef2v2"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="2v2"
+                        android:textAllCaps="false"
+                        android:textColor="@drawable/toggle_defensa_text"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDef1v1"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1v1"
+                        android:textAllCaps="false"
+                        android:textColor="@drawable/toggle_defensa_text"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <!-- 2v2 !-->
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleSitDef2v2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:orientation="horizontal"
+                        android:spacing="15dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDefExterior"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Exterior"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_defensa_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDefCentro"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Centro"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_defensa_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                    <!-- Sit1v1 !-->
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleSitDef1v1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:orientation="horizontal"
+                        android:spacing="15dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDefFuerte"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Fuerte"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_defensa_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDefDebil"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Débil"
+                            android:textAllCaps="false"
+                            android:textColor="@drawable/toggle_defensa_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- tipoContra !-->
+        <LinearLayout
+            android:id="@+id/containerDefContraataque"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleDefTipoContra"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:spacing="20dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDef1ol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="1ª oleada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_defensa_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDef2ol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="2ª oleada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_defensa_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDef3ol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="3ª oleada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_defensa_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_defensa_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/containerFinalizacion"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="1dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/btnStats"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleFinalizacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:orientation="horizontal"
+            android:spacing="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLanzamiento"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Lanzamiento"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_fin_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_fin_bg" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPerdida"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Pérdida"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_fin_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_fin_bg" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContinuidad"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Continuidad (Falta, penalti...)"
+                android:textAllCaps="false"
+                android:textColor="@drawable/toggle_fin_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="@drawable/toggle_fin_bg" />
+
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <LinearLayout
+            android:id="@+id/containerLanzamiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleZona"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:orientation="horizontal"
+                android:spacing="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn6m"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="6m"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn7m"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="7m"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn9m"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="9m"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExt"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Extremo"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPiv"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pivote"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleResultado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:orientation="horizontal"
+                android:spacing="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGol"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Gol"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnParada"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Parada"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFuera"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fuera"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/containerPerdida"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/togglePerdida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:orientation="horizontal"
+                android:spacing="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnInfraccion"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Infracción"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRobo"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Robo"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnBanda"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Banda"
+                    android:textAllCaps="false"
+                    android:textColor="@drawable/toggle_fin_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@drawable/toggle_fin_bg" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnCambio"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:width="300dp"
+        android:backgroundTint="#3C5FEF"
+        android:text="Cambiar jugadores"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnStats"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:width="300dp"
+        android:backgroundTint="#646464"
+        android:text="Consultar estadísticas"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnAmon"
+        app:layout_constraintStart_toEndOf="@+id/btnCambio" />
+
+    <Button
+        android:id="@+id/btnAmon"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="8dp"
+        android:width="300dp"
+        android:backgroundTint="#F42517"
+        android:text="Tarjeta / Exclusión"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

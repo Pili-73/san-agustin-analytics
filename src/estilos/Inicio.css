@@ -1,0 +1,56 @@
+/*------------------------ INICIO ---------------------------*/
+.inicio {
+  min-height: 100dvh;
+  text-align: center;
+  padding: 0 clamp(16px, 4vw, 48px) 40px;
+}
+
+.equipos {
+  max-width: 1200px;
+  margin: 28px auto 0;
+}
+
+.equipos__carrusel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 8px 4px 18px;
+  scroll-snap-type: x proximity;
+}
+
+.tarjeta-equipo {
+  display: flex;
+  flex: 0 0 min(220px, 62vw);
+  min-height: 240px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 26px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--color-rojo-claro);
+  color: var(--color-texto);
+  scroll-snap-align: start;
+  text-align: left;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 12%);
+}
+
+.tarjeta-equipo h2, .tarjeta-equipo p { margin: 0; }
+.tarjeta-equipo h2 { font-size: clamp(1.6rem, 3vw, 2rem); }
+.tarjeta-equipo p { color: var(--color-texto-suave); }
+.tarjeta-equipo__acciones { display: grid; gap: 10px; }
+.tarjeta-equipo__acciones a { padding: 12px; border-radius: 10px; background: #fff; color: var(--color-rojo-oscuro); font-weight: 700; text-align: center; text-decoration: none; }
+.tarjeta-equipo--alta { align-items: center; justify-content: center; border: 2px dashed var(--color-rojo); color: var(--color-rojo-oscuro); cursor: pointer; font: 700 1.2rem/1.2 var(--fuente); text-align: center; }
+.tarjeta-equipo--alta span { font-size: 4rem; font-weight: 300; }
+.form-equipo { display: grid; gap: 14px; }
+.form-equipo label { display: grid; gap: 6px; font-weight: 700; }
+.form-equipo label span { font-weight: 400; }
+.form-equipo input { min-height: 44px; padding: 0 10px; border: 1px solid #bbb; border-radius: 8px; font: inherit; }
+
+.inicio h1 {
+  margin: 32px 10px 0;
+  color: var(--color-rojo);
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1.2;
+}

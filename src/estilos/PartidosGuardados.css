@@ -1,0 +1,74 @@
+@import "./comun.css";
+
+.vista-partidos {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 16px 20px 48px;
+}
+
+.cabecera-partidos {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.lista-partidos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ficha-partido {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-rojo-claro);
+  text-decoration: none;
+  color: var(--color-texto);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ficha-partido:hover {
+  box-shadow: 0 4px 14px rgb(0 0 0 / 14%);
+  transform: translateY(-1px);
+}
+
+.ficha-partido strong {
+  grid-column: 1;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.campo-partido {
+  grid-column: 1;
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+}
+
+.campo-partido::before {
+  content: "📍 ";
+}
+
+.ficha-partido time {
+  grid-column: 2;
+  color: var(--color-rojo-oscuro);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.ficha-partido time:first-of-type {
+  grid-row: 1;
+}
+
+.partidos-guardados__titulo {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
