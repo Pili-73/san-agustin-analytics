@@ -275,8 +275,8 @@
 
 .otras-acciones__item {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  gap: 6px;
   padding: 6px 10px;
   border-radius: 8px;
   background: #fff;
@@ -297,7 +297,7 @@
   margin: 20px 0 8px;
   padding: 10px;
   text-align: center;
-  color: #fff;
+  color: var(--color-texto);
   font-size: 1.1rem;
   font-weight: 700;
   border-radius: 6px;
@@ -305,6 +305,7 @@
 
 .estadisticas__banda--sanciones {
   background: var(--color-gris);
+  color: #fff;
 }
 
 .estadisticas__sanciones {
@@ -319,4 +320,299 @@
 .estadisticas__sanciones strong {
   color: var(--color-rojo-oscuro);
   font-size: 1.2rem;
+}
+
+/* --- Selector de jugador (entrada a estadísticas por jugador, y cambio
+   entre jugadores dentro de esa pantalla) --- */
+.jugadores-switch {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 16px;
+  margin-top: 4px;
+}
+
+.jugadores-switch__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-gris-claro);
+  background: #fff;
+  color: var(--color-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.jugadores-switch__pill strong {
+  color: var(--color-texto-suave);
+  font-size: 0.8rem;
+}
+
+.jugadores-switch__pill.is-selected {
+  border-color: var(--color-rojo);
+  background: var(--color-rojo-claro);
+  color: var(--color-rojo-oscuro);
+}
+
+.jugadores-switch__pill.is-selected strong {
+  color: var(--color-rojo-oscuro);
+}
+
+.jugadores-switch__pill--portero {
+  border-color: var(--color-amarillo);
+}
+
+/* --- Filtro de tiempo (1ª/2ª parte + intervalo a medida) --- */
+.filtro-tiempo {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #fafafa;
+}
+
+.filtro-tiempo__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.filtro-tiempo__presets button {
+  flex: 1;
+  min-width: 110px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-gris-claro);
+  background: #fff;
+  color: var(--color-texto);
+  font-family: var(--fuente);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.filtro-tiempo__presets button.is-selected {
+  border-color: var(--color-rojo);
+  background: var(--color-rojo-claro);
+  color: var(--color-rojo-oscuro);
+}
+
+.filtro-tiempo__rango {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filtro-tiempo__etiqueta {
+  align-self: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-texto);
+}
+
+.filtro-tiempo__pista {
+  position: relative;
+  height: 32px;
+}
+
+.filtro-tiempo__pista::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: 3px;
+  background: var(--color-gris-claro);
+}
+
+.filtro-tiempo__relleno {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: 3px;
+  background: var(--color-rojo);
+}
+
+.filtro-tiempo__pista input[type="range"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 32px;
+  margin: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: none;
+}
+
+.filtro-tiempo__pista input[type="range"]::-webkit-slider-runnable-track {
+  background: transparent;
+}
+
+.filtro-tiempo__pista input[type="range"]::-moz-range-track {
+  background: transparent;
+}
+
+.filtro-tiempo__pista input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: all;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-rojo);
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
+  cursor: pointer;
+}
+
+.filtro-tiempo__pista input[type="range"]::-moz-range-thumb {
+  pointer-events: all;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-rojo);
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
+  cursor: pointer;
+}
+
+/* --- Mapa de eficacia por zona (misma imagen y geometría que Directo,
+   mostrando goles/lanzamientos en vez de selectores) --- */
+.mapa-eficacia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.mapa-eficacia__titulo {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mapa-eficacia__imagen {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  aspect-ratio: 858 / 1024;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+}
+
+.mapa-eficacia__imagen > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mapa-eficacia__cuadrantes {
+  position: absolute;
+  top: 15.7%;
+  left: 15%;
+  width: 70%;
+  height: 37%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.mapa-eficacia__celda {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 55%);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+/* Mismo truco de dos capas que en zona_lanz: el halo (solo trazo blanco,
+   relleno transparente) va debajo; el número, encima, con trazo del mismo
+   color que el relleno para engordarlo. Superponerlos con text-shadow no
+   funcionaba: el trazo oscuro grueso terminaba tapando la sombra blanca. */
+.mapa-eficacia__celda-halo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  -webkit-text-stroke: 1.6px #fff;
+}
+
+.mapa-eficacia__celda-num {
+  position: relative;
+  color: var(--color-texto);
+  -webkit-text-stroke: 1px var(--color-texto);
+}
+
+.mapa-eficacia__cuadrantes--ataque .mapa-eficacia__celda {
+  background: rgb(216 67 62 / 22%);
+}
+
+.mapa-eficacia__cuadrantes--defensa .mapa-eficacia__celda {
+  background: rgb(239 189 36 / 28%);
+}
+
+.mapa-eficacia__zonas-lanz {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mapa-eficacia__zonas-lanz polygon {
+  stroke: rgb(255 255 255 / 55%);
+  stroke-width: 0.6;
+}
+
+.mapa-eficacia__zonas-lanz--ataque polygon {
+  fill: var(--color-rojo);
+  fill-opacity: 0.22;
+}
+
+.mapa-eficacia__zonas-lanz--defensa polygon {
+  fill: var(--color-amarillo);
+  fill-opacity: 0.28;
+}
+
+.mapa-eficacia__zonas-lanz text {
+  font-family: var(--fuente);
+  font-size: 4px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* Dos copias del mismo texto: el halo (solo trazo blanco, sin relleno) va
+   detrás; el número real, encima, lleva un trazo fino del mismo color que el
+   relleno para engordar el glifo de verdad (font-weight solo no bastaba,
+   la fuente no tiene un corte más negro que el que ya se cargó). */
+.mapa-eficacia__zonas-lanz-halo {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.6px;
+  stroke-linejoin: round;
+}
+
+.mapa-eficacia__zonas-lanz-num {
+  fill: var(--color-texto);
+  stroke: var(--color-texto);
+  stroke-width: 0.35px;
 }

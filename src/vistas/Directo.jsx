@@ -7,6 +7,7 @@ import { usePartidoEnDirecto } from "../estado/usePartidoEnDirecto";
 import { useArrastrePlantilla } from "../estado/useArrastrePlantilla";
 import { formatearTiempo } from "../utils/tiempo";
 import { borrarEstadoDirecto, guardarEstadoDirecto, leerEstadoDirecto } from "../utils/estadoDirecto";
+import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
 import BarraMarcador from "../piezas/partido/BarraMarcador";
 import Modal from "../piezas/comun/Modal";
 import Toast from "../piezas/comun/Toast";
@@ -125,6 +126,7 @@ export default function Directo() {
         setTipoDefRival(guardado.tipoDefRival || "6:0");
         partidoEnDirecto.restaurarElapsedMs(guardado.elapsedMs);
         partidoEnDirecto.restaurarMarcador(guardado.golesAgustinos, guardado.golesRival);
+        setParte(guardado.parte || 1);
       } else {
         setCampoIds(jugadoresCargados.slice(0, 7).map((jugador) => jugador.id));
         setBanquilloIds(jugadoresCargados.slice(7).map((jugador) => jugador.id));
@@ -230,15 +232,31 @@ export default function Directo() {
     setMenuMarcador(false);
   };
 
+  // El reloj sigue corriendo en continuo (0-60, no se reinicia por parte):
+  // así el tiempo guardado en cada acción sitúa la 2ª parte en el minuto 30
+  // en adelante, que es lo que usa el filtro de tiempo de Estadísticas.
   const finalizarPrimerTiempo = () => {
     if (!window.confirm("¿Finalizar el primer tiempo?")) return;
     partidoEnDirecto.pausarCronometro();
-    partidoEnDirecto.establecerTiempoManual(0, 0);
+    partidoEnDirecto.establecerTiempoManual(30, 0);
     setParte(2);
     setMenuMarcador(false);
+    // Se guarda aquí mismo (no solo al ir a Estadísticas): si el cronómetro
+    // no llegara a fijarse a 30:00 por cualquier motivo, al menos el
+    // marcador y el resto del estado quedan a salvo tal como estaban.
+    guardarEstadoDirecto(partidoId, {
+      elapsedMs: 30 * 60 * 1000,
+      golesAgustinos: partidoEnDirecto.marcador.golesAgustinos,
+      golesRival: partidoEnDirecto.marcador.golesRival,
+      tipoDefPropio,
+      tipoDefRival,
+      campoIds,
+      banquilloIds,
+      parte: 2,
+    });
   };
 
-  const verEstadisticas = () => {
+  const verEstadisticas = (ruta) => {
     guardarEstadoDirecto(partidoId, {
       elapsedMs: partidoEnDirecto.elapsedMs,
       golesAgustinos: partidoEnDirecto.marcador.golesAgustinos,
@@ -247,8 +265,9 @@ export default function Directo() {
       tipoDefRival,
       campoIds,
       banquilloIds,
+      parte,
     });
-    navigate(`/partidos/${partidoId}/estadisticas`);
+    navigate(ruta);
   };
 
   const finalizarPartido = () => {
@@ -401,8 +420,11 @@ export default function Directo() {
           <button type="button" onClick={abrirEditarTiempo}>
             <span aria-hidden="true">✎</span>Editar tiempo
           </button>
-          <button type="button" onClick={verEstadisticas}>
-            <span aria-hidden="true">📊</span>Ver estadísticas
+          <button type="button" onClick={() => verEstadisticas(`/partidos/${partidoId}/estadisticas`)}>
+            <span aria-hidden="true">📊</span>Estadísticas generales
+          </button>
+          <button type="button" onClick={() => verEstadisticas(`/partidos/${partidoId}/estadisticas/jugador`)}>
+            <span aria-hidden="true">🧍</span>Estadísticas por jugador
           </button>
           {parte === 1 && <button type="button" className="menu-marcador__parte" onClick={finalizarPrimerTiempo}>
             <span aria-hidden="true">⏭</span>Fin primer tiempo
@@ -476,19 +498,8 @@ function SelectorCuadrantes({ clase, etiqueta, valor, onChange }) {
 }
 
 function SelectorZonasLanz({ valor, onChange }) {
-  const zonas = [
-    // Zonas 1–5: entre las líneas continua (área) y discontinua, de izquierda a derecha.
-    "0,54 12,54 22,61 0,76", "22,61 38,66 31,79 9,70",
-    "38,66 61,66 68,79 31,79", "62,66 79,61 92,71 69,79",
-    "78,61 88,54 100,54 100,76",
-    // Zonas 6–8: exterior de la discontinua, izquierda, centro y derecha.
-    "0,76 9,70 31,79 23,94 0,97", "31,79 68,79 77,94 23,94", "69,79 92,71 100,76 100,96 77,94",
-    // Zona 9: lanzamiento lejano, por detrás de las ocho zonas anteriores.
-    "0,97 31,93 70,93 100,96 100,100 0,100",
-  ];
-
   return <svg className="selector-zonas-lanz" viewBox="0 0 100 100" preserveAspectRatio="none" role="group" aria-label="Zona de lanzamiento">
-    {zonas.map((puntos, indice) => {
+    {ZONAS_LANZAMIENTO.map((puntos, indice) => {
       const zona = indice + 1;
       return <polygon key={zona} points={puntos} className={valor === zona ? "is-selected" : ""} onClick={() => onChange(zona)}><title>Zona de lanzamiento {zona}</title></polygon>;
     })}

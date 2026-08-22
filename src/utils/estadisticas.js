@@ -3,6 +3,30 @@
 // `zona_lanz`, `zona_porteria`) o bien un evento de ataque/defensa/sanción
 // (tiene `fin`). Ambos comparten `at_def_san`, `sit_ofensiva` y `tipo_def`.
 
+import { minutosDeTiempo } from "./tiempo";
+
+// Filtra por el minuto de partido en el que se registró cada acción (según
+// su `tiempo`, "mm:ss"). rango es [inicio, fin] en minutos, o null para no
+// filtrar. Las acciones sin tiempo parseable se excluyen si hay filtro activo.
+export function filtrarPorTiempo(acciones, rango) {
+  if (!rango) return acciones;
+  const [inicio, fin] = rango;
+  return acciones.filter((accion) => {
+    const minutos = minutosDeTiempo(accion.tiempo);
+    return minutos != null && minutos >= inicio && minutos <= fin;
+  });
+}
+
+// Minuto más alto registrado en el partido (para acotar la barra de
+// intervalo); nunca por debajo de 60 aunque el partido lleve poco jugado.
+export function calcularMaxMinutos(acciones) {
+  const maximo = acciones.reduce((actual, accion) => {
+    const minutos = minutosDeTiempo(accion.tiempo);
+    return minutos != null ? Math.max(actual, minutos) : actual;
+  }, 0);
+  return Math.max(60, Math.ceil(maximo));
+}
+
 export const FILTROS_SITUACION = [
   { value: "POS", label: "Posicional" },
   { value: "CGOL", label: "Contragol" },
@@ -115,6 +139,51 @@ export function calcularDesglosePorCampo(todasLasAcciones, contexto, campo, opci
       pctFueras: porcentaje(fueras, lanzamientos),
     };
   });
+}
+
+// Suma el detalle de ataque y defensa de un jugador en un único recuento por
+// categoría: en la vista por jugador no interesa separar contexto, solo
+// cuántas veces hizo cada cosa en todo el partido.
+const CATEGORIAS_ACCION = [
+  "perdidas", "infracciones", "faltasAtaque", "faltasRecibidas",
+  "bloqueos", "intercepciones", "unoVsUno", "dosVsDos", "penaltis", "exclusiones",
+];
+
+export function combinarPorCategoria(estadisticasAtaque, estadisticasDefensa) {
+  return Object.fromEntries(
+    CATEGORIAS_ACCION.map((clave) => [clave, estadisticasAtaque[clave] + estadisticasDefensa[clave]])
+  );
+}
+
+function zonasVacias() {
+  return Object.fromEntries(Array.from({ length: 9 }, (_, i) => [i + 1, { goles: 0, lanzamientos: 0 }]));
+}
+
+// Goles/lanzamientos por cada una de las 9 zonas de lanzamiento y de las 9
+// zonas de portería, para el mapa de eficacia visual. En ataque son los
+// lanzamientos propios; en defensa, los recibidos por el portero (eficacia
+// de portería en defensa).
+export function calcularEficaciaPorZonas(todasLasAcciones, contexto) {
+  const lanzamientos = todasLasAcciones.filter(
+    (accion) => accion.at_def_san === contexto && Boolean(accion.gol_parada_fuera)
+  );
+
+  const porZonaLanz = zonasVacias();
+  const porZonaPorteria = zonasVacias();
+
+  for (const accion of lanzamientos) {
+    const esGol = accion.gol_parada_fuera === "GOL";
+    if (accion.zona_lanz && porZonaLanz[accion.zona_lanz]) {
+      porZonaLanz[accion.zona_lanz].lanzamientos += 1;
+      if (esGol) porZonaLanz[accion.zona_lanz].goles += 1;
+    }
+    if (accion.zona_porteria && porZonaPorteria[accion.zona_porteria]) {
+      porZonaPorteria[accion.zona_porteria].lanzamientos += 1;
+      if (esGol) porZonaPorteria[accion.zona_porteria].goles += 1;
+    }
+  }
+
+  return { porZonaLanz, porZonaPorteria };
 }
 
 // Recuento de sanciones de todo el partido (no se dividen en ataque/defensa).

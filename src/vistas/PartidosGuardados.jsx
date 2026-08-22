@@ -36,17 +36,28 @@ export default function PartidosGuardados() {
         <EstadoCarga cargando={cargando} error={error} mensajeCargando="Cargando partidos…">
           {partidos.length === 0 && <p className="estado-carga">No hay partidos registrados.</p>}
           {partidos.map((partido) => (
-            <Link
-              className="ficha-partido"
-              to={`/partidos/${partido.id}/estadisticas`}
-              state={{ equipo: equipo?.nombre, rival: partido.rival }}
-              key={partido.id}
-            >
+            <article className="ficha-partido" key={partido.id}>
               <strong>{equipo?.nombre || "Equipo"} vs {partido.rival}</strong>
               {partido.campo && <span className="campo-partido">{partido.campo}</span>}
               <time>{partido.fecha}</time>
               <time>{partido.hora}</time>
-            </Link>
+              <div className="ficha-partido__botones">
+                <Link
+                  className="ficha-partido__boton"
+                  to={`/partidos/${partido.id}/estadisticas`}
+                  state={{ equipo: equipo?.nombre, rival: partido.rival }}
+                >
+                  Estadísticas generales
+                </Link>
+                <Link
+                  className="ficha-partido__boton ficha-partido__boton--jugador"
+                  to={`/partidos/${partido.id}/estadisticas/jugador`}
+                  state={{ equipo: equipo?.nombre, rival: partido.rival }}
+                >
+                  Estadísticas por jugador
+                </Link>
+              </div>
+            </article>
           ))}
         </EstadoCarga>
       </section>

@@ -5,6 +5,15 @@ export function formatearTiempo(ms) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
+// Inversa de formatearTiempo: de "mm:ss" a minutos (con decimales), para
+// poder filtrar acciones por intervalo de tiempo. null si no es parseable.
+export function minutosDeTiempo(tiempo) {
+  if (!tiempo) return null;
+  const [mm, ss] = tiempo.split(":").map(Number);
+  if (Number.isNaN(mm) || Number.isNaN(ss)) return null;
+  return mm + ss / 60;
+}
+
 export function fechaDeHoy() {
   // yyyy-MM-dd, formato nativo de <input type="date"> y de la columna "date" en Supabase
   return new Date().toISOString().slice(0, 10);

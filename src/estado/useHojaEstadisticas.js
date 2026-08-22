@@ -5,11 +5,15 @@ import {
   FILTROS_DEFENSA,
   FILTROS_SITUACION,
   calcularDesglosePorCampo,
+  calcularEficaciaPorZonas,
   calcularEstadisticas,
+  calcularMaxMinutos,
   calcularSanciones,
+  filtrarPorTiempo,
 } from "../utils/estadisticas";
 
-export function useHojaEstadisticas(partidoId) {
+// rango: [inicio, fin] en minutos de partido, o null para no filtrar por tiempo.
+export function useHojaEstadisticas(partidoId, rango = null) {
   const [acciones, setAcciones] = useState([]);
 
   const { cargando, error } = useCargaAsync(
@@ -21,30 +25,39 @@ export function useHojaEstadisticas(partidoId) {
     }
   );
 
-  const estadisticasAtaque = useMemo(() => calcularEstadisticas(acciones, "ATQ", null), [acciones]);
-  const estadisticasDefensa = useMemo(() => calcularEstadisticas(acciones, "DEF", null), [acciones]);
-  const sanciones = useMemo(() => calcularSanciones(acciones), [acciones]);
+  // maxMinutos se calcula sobre todas las acciones (no las filtradas), para
+  // que la barra de intervalo no se reduzca al acotar el filtro.
+  const maxMinutos = useMemo(() => calcularMaxMinutos(acciones), [acciones]);
+  const accionesFiltradas = useMemo(() => filtrarPorTiempo(acciones, rango), [acciones, rango]);
+
+  const estadisticasAtaque = useMemo(() => calcularEstadisticas(accionesFiltradas, "ATQ", null), [accionesFiltradas]);
+  const estadisticasDefensa = useMemo(() => calcularEstadisticas(accionesFiltradas, "DEF", null), [accionesFiltradas]);
+  const sanciones = useMemo(() => calcularSanciones(accionesFiltradas), [accionesFiltradas]);
 
   const desgloseSituacionAtaque = useMemo(
-    () => calcularDesglosePorCampo(acciones, "ATQ", "sit_ofensiva", FILTROS_SITUACION),
-    [acciones]
+    () => calcularDesglosePorCampo(accionesFiltradas, "ATQ", "sit_ofensiva", FILTROS_SITUACION),
+    [accionesFiltradas]
   );
   const desgloseSituacionDefensa = useMemo(
-    () => calcularDesglosePorCampo(acciones, "DEF", "sit_ofensiva", FILTROS_SITUACION),
-    [acciones]
+    () => calcularDesglosePorCampo(accionesFiltradas, "DEF", "sit_ofensiva", FILTROS_SITUACION),
+    [accionesFiltradas]
   );
   const desgloseFormacionAtaque = useMemo(
-    () => calcularDesglosePorCampo(acciones, "ATQ", "tipo_def", FILTROS_DEFENSA),
-    [acciones]
+    () => calcularDesglosePorCampo(accionesFiltradas, "ATQ", "tipo_def", FILTROS_DEFENSA),
+    [accionesFiltradas]
   );
   const desgloseFormacionDefensa = useMemo(
-    () => calcularDesglosePorCampo(acciones, "DEF", "tipo_def", FILTROS_DEFENSA),
-    [acciones]
+    () => calcularDesglosePorCampo(accionesFiltradas, "DEF", "tipo_def", FILTROS_DEFENSA),
+    [accionesFiltradas]
   );
+
+  const eficaciaZonasAtaque = useMemo(() => calcularEficaciaPorZonas(accionesFiltradas, "ATQ"), [accionesFiltradas]);
+  const eficaciaZonasDefensa = useMemo(() => calcularEficaciaPorZonas(accionesFiltradas, "DEF"), [accionesFiltradas]);
 
   return {
     cargando,
     error,
+    maxMinutos,
     estadisticasAtaque,
     estadisticasDefensa,
     sanciones,
@@ -52,5 +65,7 @@ export function useHojaEstadisticas(partidoId) {
     desgloseSituacionDefensa,
     desgloseFormacionAtaque,
     desgloseFormacionDefensa,
+    eficaciaZonasAtaque,
+    eficaciaZonasDefensa,
   };
 }

@@ -28,15 +28,39 @@
   border: 0;
   border-radius: 14px;
   background: var(--color-rojo-claro);
-  text-decoration: none;
   color: var(--color-texto);
   box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+}
+
+.ficha-partido__botones {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ficha-partido__boton {
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-rojo);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.ficha-partido:hover {
+.ficha-partido__boton:hover {
   box-shadow: 0 4px 14px rgb(0 0 0 / 14%);
   transform: translateY(-1px);
+}
+
+.ficha-partido__boton--jugador {
+  background: var(--color-azul);
 }
 
 .ficha-partido strong {

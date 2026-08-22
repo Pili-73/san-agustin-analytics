@@ -1,11 +1,11 @@
 // Cifras clave del contexto (ataque o defensa), como tarjetas grandes y
 // escaneables antes de entrar en el detalle de las barras.
-export default function ResumenCifras({ resumen }) {
+export default function ResumenCifras({ resumen, titulos = ["Lanzamientos", "Goles", "Paradas", "Fueras"] }) {
   const tiles = [
-    { titulo: "Lanzamientos", valor: resumen.lanzamientos },
-    { titulo: "Goles", valor: resumen.goles, pct: resumen.pctGoles, tono: "verde" },
-    { titulo: "Paradas", valor: resumen.paradas, pct: resumen.pctParadas, tono: "azul" },
-    { titulo: "Fueras", valor: resumen.fueras, pct: resumen.pctFueras, tono: "malo" },
+    { titulo: titulos[0], valor: resumen.lanzamientos },
+    { titulo: titulos[1], valor: resumen.goles, pct: resumen.pctGoles, tono: "verde" },
+    { titulo: titulos[2], valor: resumen.paradas, pct: resumen.pctParadas, tono: "azul" },
+    { titulo: titulos[3], valor: resumen.fueras, pct: resumen.pctFueras, tono: "malo" },
   ];
 
   return (

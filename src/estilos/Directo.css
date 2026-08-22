@@ -231,4 +231,12 @@
     gap: 6px;
   }
   .acciones-lanzamiento--flotante button { min-height: 0; height: 100%; padding: 0 4px; font-size: .74rem; }
+
+  /* Ataque, Defensa y Sanciones en una sola fila (en vez de 2): así cada
+     botón ocupa un tercio del panel en lugar de la mitad, y el desplegable
+     (que hereda ese ancho) deja más pantalla libre para mostrar sus opciones. */
+  .acciones-jugador__grupos { grid-template-columns: repeat(3, 1fr); }
+  .grupo-accion--atq { grid-area: 1 / 1 / 2 / 2; }
+  .grupo-accion--def { grid-area: 1 / 2 / 2 / 3; }
+  .grupo-accion--san { grid-area: 1 / 3 / 2 / 4; }
 }
