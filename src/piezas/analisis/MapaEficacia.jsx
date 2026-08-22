@@ -37,7 +37,7 @@ export default function MapaEficacia({ titulo, porZonaPorteria, porZonaLanz, var
             return (
               <g key={zona}>
                 <polygon points={puntos} />
-                <text className="mapa-eficacia__zonas-lanz-halo" x={x} y={y}>
+                <text className="mapa-eficacia__zonas-lanz-halo" x={x} y={y} aria-hidden="true">
                   {formatearFraccion(porZonaLanz[zona])}
                 </text>
                 <text className="mapa-eficacia__zonas-lanz-num" x={x} y={y}>

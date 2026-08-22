@@ -1,4 +1,5 @@
 import { supabase, unwrap } from "../lib/supabase";
+import { conCache } from "../utils/cacheDatos";
 
 const COLUMNAS = "id, nombre, apellido, dorsal, posicion, id_equipo, activo";
 
@@ -6,10 +7,12 @@ const COLUMNAS = "id, nombre, apellido, dorsal, posicion, id_equipo, activo";
 // La pantalla de gestión de plantilla pide incluirInactivos para ver también
 // los dados de baja y poder reactivarlos.
 export async function listarJugadoresEquipo(idEquipo, { incluirInactivos = false } = {}) {
-  let query = supabase.from("jugador").select(COLUMNAS).eq("id_equipo", idEquipo).order("dorsal");
-  if (!incluirInactivos) query = query.eq("activo", true);
-
-  return unwrap(query);
+  const clave = `jugadores:${idEquipo}:${incluirInactivos ? "todos" : "activos"}`;
+  return conCache(clave, () => {
+    let query = supabase.from("jugador").select(COLUMNAS).eq("id_equipo", idEquipo).order("dorsal");
+    if (!incluirInactivos) query = query.eq("activo", true);
+    return unwrap(query);
+  });
 }
 
 export async function crearJugador({ nombre, apellido, dorsal, posicion, id_equipo }) {

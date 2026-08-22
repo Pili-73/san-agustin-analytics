@@ -221,16 +221,76 @@
 
 .barra-desglose__detalle {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
+  flex-direction: column;
+  gap: 10px;
   padding: 4px 12px 12px 106px;
   font-size: 0.8rem;
   color: var(--color-texto-suave);
 }
 
+.barra-desglose__fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
 .barra-desglose__detalle strong {
   color: var(--color-texto);
 }
+
+/* --- Barra segmentada (varios tramos proporcionales en una misma barra) --- */
+.barra-segmentada {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.barra-segmentada__pista {
+  display: flex;
+  height: 8px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--color-gris-claro);
+}
+
+.barra-segmentada__segmento {
+  display: block;
+  height: 100%;
+}
+
+.barra-segmentada__segmento--ataque { background: var(--color-rojo); }
+.barra-segmentada__segmento--defensa { background: var(--color-azul); }
+.barra-segmentada__segmento--verde { background: var(--color-verde); }
+.barra-segmentada__segmento--azul { background: var(--color-azul); }
+.barra-segmentada__segmento--malo { background: var(--color-rojo-malo); }
+.barra-segmentada__segmento--gris { background: var(--color-gris); }
+
+.barra-segmentada__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.barra-segmentada__etiqueta strong {
+  color: var(--color-texto);
+}
+
+.barra-segmentada__etiqueta::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.barra-segmentada__etiqueta--ataque::before { background: var(--color-rojo); }
+.barra-segmentada__etiqueta--defensa::before { background: var(--color-azul); }
+.barra-segmentada__etiqueta--verde::before { background: var(--color-verde); }
+.barra-segmentada__etiqueta--azul::before { background: var(--color-azul); }
+.barra-segmentada__etiqueta--malo::before { background: var(--color-rojo-malo); }
+.barra-segmentada__etiqueta--gris::before { background: var(--color-gris); }
 
 @media (max-width: 480px) {
   .barra-desglose__cabecera {
@@ -400,6 +460,20 @@
   border-color: var(--color-rojo);
   background: var(--color-rojo-claro);
   color: var(--color-rojo-oscuro);
+}
+
+/* Móvil: "Todo el partido"/"Toda la temporada" (siempre el primer botón)
+   entero arriba, y el resto (1ª/2ª parte) a media anchura debajo, en vez de
+   dejar que el ajuste de línea los reparta de forma impredecible. */
+@media (max-width: 480px) {
+  .filtro-tiempo__presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filtro-tiempo__presets button:first-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .filtro-tiempo__rango {

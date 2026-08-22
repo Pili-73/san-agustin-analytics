@@ -1,7 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { crearAccion, eliminarAccion } from "../datos/acciones";
 import { formatearTiempo } from "../utils/tiempo";
-import { encolarAccion, leerPendientes, quitarDeCola, reencolar, tomarSiguiente } from "../utils/colaSincronizacion";
+import {
+  encolarAccion,
+  encolarBorrado,
+  leerBorradosPendientes,
+  leerPendientes,
+  quitarDeCola,
+  reencolar,
+  reencolarBorrado,
+  tomarSiguiente,
+  tomarSiguienteBorrado,
+} from "../utils/colaSincronizacion";
 
 // Un fallo de red (wifi de pabellón cayéndose) se distingue de un error real
 // del servidor porque la petición nunca llega a completarse: supabase-js lo
@@ -21,6 +31,7 @@ export function usePartidoEnDirecto(partidoId) {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [running, setRunning] = useState(false);
   const [pendientes, setPendientes] = useState(() => leerPendientes(partidoId));
+  const [pendientesBorrado, setPendientesBorrado] = useState(() => leerBorradosPendientes(partidoId).length);
   const [ultimaAccion, setUltimaAccion] = useState(null);
   const startTimeRef = useRef(0);
   const intervalRef = useRef(null);
@@ -58,6 +69,18 @@ export function usePartidoEnDirecto(partidoId) {
           reencolar(partidoId, item);
           setPendientes(leerPendientes(partidoId));
           break; // sigue sin red (u otro fallo persistente): se reintenta en el siguiente ciclo
+        }
+      }
+
+      let idAccion;
+      while (activo && (idAccion = tomarSiguienteBorrado(partidoId))) {
+        try {
+          await eliminarAccion(idAccion);
+          setPendientesBorrado(leerBorradosPendientes(partidoId).length);
+        } catch {
+          reencolarBorrado(partidoId, idAccion);
+          setPendientesBorrado(leerBorradosPendientes(partidoId).length);
+          break;
         }
       }
     };
@@ -145,19 +168,33 @@ export function usePartidoEnDirecto(partidoId) {
 
   // Deshace solo la última acción (no hay historial de varios pasos): borra
   // la fila si ya se sincronizó, o la quita de la cola si seguía pendiente.
+  // Si el borrado falla por red, se encola igual que al guardar: se aplica
+  // ya en cliente (marcador y estadísticas) y se reintenta solo al volver la
+  // conexión, en vez de dejar la acción errónea sin poder deshacerla.
   const deshacerUltimaAccion = async () => {
     if (!ultimaAccion || guardando) return false;
 
     setGuardando(true);
     try {
+      let mensaje = "Acción deshecha";
+      let tipo = "ok";
+
       if (ultimaAccion.idAccion != null) {
-        await eliminarAccion(ultimaAccion.idAccion);
+        try {
+          await eliminarAccion(ultimaAccion.idAccion);
+        } catch (err) {
+          if (!esErrorDeRed(err)) throw err;
+          setPendientesBorrado(encolarBorrado(partidoId, ultimaAccion.idAccion).length);
+          mensaje = "Sin conexión: se deshará cuando vuelva la red";
+          tipo = "pendiente";
+        }
       } else {
         setPendientes(quitarDeCola(partidoId, ultimaAccion.idLocal));
       }
+
       aplicarGolSiCorresponde(ultimaAccion.accion, -1);
       setUltimaAccion(null);
-      mostrarAviso("Acción deshecha", "ok");
+      mostrarAviso(mensaje, tipo);
       return true;
     } catch (err) {
       console.error("Error deshaciendo la última acción", err);
@@ -178,6 +215,7 @@ export function usePartidoEnDirecto(partidoId) {
     elapsedMs,
     running,
     pendientes,
+    pendientesBorrado,
     puedeDeshacer: ultimaAccion != null,
     iniciarCronometro,
     pausarCronometro,

@@ -1,13 +1,20 @@
 import { useEffect } from "react";
-import { crearAccion } from "../datos/acciones";
-import { idsPartidosConCola, reencolar, tomarSiguiente } from "../utils/colaSincronizacion";
+import { crearAccion, eliminarAccion } from "../datos/acciones";
+import {
+  idsPartidosConCola,
+  idsPartidosConColaBorrados,
+  reencolar,
+  reencolarBorrado,
+  tomarSiguiente,
+  tomarSiguienteBorrado,
+} from "../utils/colaSincronizacion";
 
 // Red de seguridad a nivel de app: usePartidoEnDirecto ya reintenta subir la
 // cola de SU partido mientras está abierta esa pantalla, pero si el partido
 // se dio por acabado sin conexión (y no se vuelve a abrir su Directo), sus
-// acciones se quedarían encoladas para siempre. Este hook, montado una vez en
-// App, revisa TODOS los partidos con cola pendiente y los reintenta, esté
-// donde esté el usuario dentro de la aplicación.
+// acciones (y sus deshacer pendientes) se quedarían encoladas para siempre.
+// Este hook, montado una vez en App, revisa TODOS los partidos con cola
+// pendiente y los reintenta, esté donde esté el usuario dentro de la app.
 export function useFlushColaGlobal() {
   useEffect(() => {
     const intentarVaciarTodas = async () => {
@@ -21,6 +28,18 @@ export function useFlushColaGlobal() {
           } catch {
             reencolar(partidoId, item);
             break; // este partido sigue sin poder subir; se prueba en el siguiente ciclo
+          }
+        }
+      }
+
+      for (const partidoId of idsPartidosConColaBorrados()) {
+        let idAccion;
+        while ((idAccion = tomarSiguienteBorrado(partidoId))) {
+          try {
+            await eliminarAccion(idAccion);
+          } catch {
+            reencolarBorrado(partidoId, idAccion);
+            break;
           }
         }
       }

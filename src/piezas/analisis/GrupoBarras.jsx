@@ -3,7 +3,7 @@ import BarraDesglose from "./BarraDesglose";
 
 // Un grupo de barras desplegables (p.ej. "Situación ofensiva"). Solo una
 // puede estar abierta a la vez, como un acordeón.
-export default function GrupoBarras({ titulo, datos, variant }) {
+export default function GrupoBarras({ titulo, datos, variant, mostrarPosesion }) {
   const [abierto, setAbierto] = useState(null);
 
   return (
@@ -16,6 +16,7 @@ export default function GrupoBarras({ titulo, datos, variant }) {
           variant={variant}
           abierto={abierto === fila.value}
           onToggle={() => setAbierto((actual) => (actual === fila.value ? null : fila.value))}
+          mostrarPosesion={mostrarPosesion}
         />
       ))}
     </div>

@@ -153,6 +153,7 @@ export default function Directo() {
   const jugadorSeleccionado = jugadores.find((jugador) => jugador.id === seleccionado);
   const esPorteroSeleccionado = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
   const puedeGuardarLanzamiento = !!jugadorSeleccionado && !!zonaLanz && !!zonaPorteria && !partidoEnDirecto.guardando;
+  const totalPendientes = partidoEnDirecto.pendientes.length + partidoEnDirecto.pendientesBorrado;
 
   // Cambiar de jugador cierra cualquier desplegable de ataque/defensa/sanción
   // que hubiera quedado abierto: sus opciones son para el jugador anterior.
@@ -271,8 +272,8 @@ export default function Directo() {
   };
 
   const finalizarPartido = () => {
-    const avisoPendientes = partidoEnDirecto.pendientes.length
-      ? `\n\nOjo: quedan ${partidoEnDirecto.pendientes.length} acciones sin subir (sin conexión). Se guardarán solas en cuanto vuelva la red, pero no aparecerán en Estadísticas hasta entonces.`
+    const avisoPendientes = totalPendientes
+      ? `\n\nOjo: quedan ${totalPendientes} cambios sin subir (sin conexión). Se guardarán solos en cuanto vuelva la red; hasta entonces solo se ven en Estadísticas desde este mismo dispositivo.`
       : "";
     if (window.confirm(`¿Estás seguro de acabar el partido?${avisoPendientes}`)) {
       partidoEnDirecto.pausarCronometro();
@@ -371,9 +372,9 @@ export default function Directo() {
             <div className="acciones-jugador__cabecera">
               <p>{jugadorSeleccionado ? `Jugador: ${jugadorSeleccionado.nombre} ${jugadorSeleccionado.apellido}` : "Selecciona un jugador para anotar acciones"}</p>
               <div className="acciones-jugador__estado">
-                {partidoEnDirecto.pendientes.length > 0 && (
-                  <span className="badge-pendientes" title="Acciones guardadas localmente, a la espera de conexión">
-                    📡 {partidoEnDirecto.pendientes.length} pendiente{partidoEnDirecto.pendientes.length > 1 ? "s" : ""}
+                {totalPendientes > 0 && (
+                  <span className="badge-pendientes" title="Cambios guardados localmente, a la espera de conexión">
+                    📡 {totalPendientes} pendiente{totalPendientes > 1 ? "s" : ""}
                   </span>
                 )}
                 {partidoEnDirecto.puedeDeshacer && (

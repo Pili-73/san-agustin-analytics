@@ -71,6 +71,18 @@
   color: var(--color-rojo-malo);
 }
 
+/* --- Aviso de sin conexión (datos servidos desde caché local) --- */
+.aviso-sin-conexion {
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--color-amarillo);
+  color: var(--color-texto);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 /* --- Toast --- */
 .toast {
   position: fixed;

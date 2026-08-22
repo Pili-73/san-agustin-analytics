@@ -6,6 +6,7 @@ import { obtenerPartido } from "../datos/partidos";
 import { obtenerEquipo } from "../datos/equipos";
 import BotonVolver from "../piezas/comun/BotonVolver";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
+import AvisoSinConexion from "../piezas/comun/AvisoSinConexion";
 import PanelContexto from "../piezas/analisis/PanelContexto";
 import FiltroTiempo from "../piezas/analisis/FiltroTiempo";
 import "../estilos/Estadisticas.css";
@@ -47,6 +48,8 @@ export default function Estadisticas() {
           {cabecera.equipoNombre || "Equipo"} vs {cabecera.rival || "Rival"}
         </h1>
       </header>
+
+      <AvisoSinConexion />
 
       <EstadoCarga cargando={hoja.cargando} error={hoja.error} mensajeCargando="Cargando estadísticas…">
         <div className="estadisticas__comparativa">

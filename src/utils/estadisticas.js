@@ -124,6 +124,19 @@ export function calcularDesglosePorCampo(todasLasAcciones, contexto, campo, opci
     const goles = acciones.filter((accion) => accion.gol_parada_fuera === "GOL").length;
     const paradas = acciones.filter((accion) => accion.gol_parada_fuera === "PAR").length;
     const fueras = acciones.filter((accion) => accion.gol_parada_fuera === "FUE").length;
+    // Solo se usan en el desglose de situación ofensiva: cómo terminó la
+    // posesión cuando no hubo lanzamiento (cambio de posesión) o cuando
+    // siguió viva (continuidad). Entre las dos cubren todos los tipos de
+    // evento sin lanzamiento, así lanzamientos+cambiosPosesion+continuidades
+    // suma siempre el total de la fila.
+    const cambiosPosesion = contar(acciones, "PER") + contar(acciones, "INF") + contar(acciones, "FAT") + contar(acciones, "INT");
+    const continuidades =
+      contar(acciones, "FAL") +
+      contar(acciones, "BLQ") +
+      contar(acciones, "1V1") +
+      contar(acciones, "2V2") +
+      contar(acciones, "7M") +
+      contar(acciones, "2MIN");
 
     return {
       value,
@@ -137,6 +150,8 @@ export function calcularDesglosePorCampo(todasLasAcciones, contexto, campo, opci
       pctParadas: porcentaje(paradas, lanzamientos),
       fueras,
       pctFueras: porcentaje(fueras, lanzamientos),
+      cambiosPosesion,
+      continuidades,
     };
   });
 }
@@ -195,4 +210,45 @@ export function calcularSanciones(todasLasAcciones) {
     rojas: contar(sanciones, "ROJA"),
     azules: contar(sanciones, "AZUL"),
   };
+}
+
+// Todo el bloque de estadísticas derivadas de una lista de acciones ya
+// filtrada (un partido, o una temporada entera): lo usan tanto la hoja de un
+// partido como la de temporada, que solo difieren en cómo llegan a esa lista.
+export function calcularHojaCompleta(acciones) {
+  return {
+    estadisticasAtaque: calcularEstadisticas(acciones, "ATQ", null),
+    estadisticasDefensa: calcularEstadisticas(acciones, "DEF", null),
+    sanciones: calcularSanciones(acciones),
+    desgloseSituacionAtaque: calcularDesglosePorCampo(acciones, "ATQ", "sit_ofensiva", FILTROS_SITUACION),
+    desgloseSituacionDefensa: calcularDesglosePorCampo(acciones, "DEF", "sit_ofensiva", FILTROS_SITUACION),
+    desgloseFormacionAtaque: calcularDesglosePorCampo(acciones, "ATQ", "tipo_def", FILTROS_DEFENSA),
+    desgloseFormacionDefensa: calcularDesglosePorCampo(acciones, "DEF", "tipo_def", FILTROS_DEFENSA),
+    eficaciaZonasAtaque: calcularEficaciaPorZonas(acciones, "ATQ"),
+    eficaciaZonasDefensa: calcularEficaciaPorZonas(acciones, "DEF"),
+  };
+}
+
+// Filtra acciones de varios partidos por la fecha del partido al que
+// pertenece cada una (no existe fecha en `accion`, solo el minuto de
+// partido en `tiempo`). partidoPorId: { [id_partido]: { fecha, ... } }.
+// rango: [fechaInicioISO, fechaFinISO], o null para no filtrar.
+export function filtrarPorFecha(acciones, partidoPorId, rango) {
+  if (!rango) return acciones;
+  const [inicio, fin] = rango;
+  return acciones.filter((accion) => {
+    const fecha = partidoPorId[accion.id_partido]?.fecha;
+    return fecha != null && fecha >= inicio && fecha <= fin;
+  });
+}
+
+// Primera y última fecha entre los partidos de un equipo (para acotar la
+// barra de intervalo de temporada). Si no hay partidos, devuelve hoy dos veces.
+export function calcularRangoFechas(partidos) {
+  const fechas = partidos.map((partido) => partido.fecha).filter(Boolean).sort();
+  if (fechas.length === 0) {
+    const hoy = new Date().toISOString().slice(0, 10);
+    return [hoy, hoy];
+  }
+  return [fechas[0], fechas[fechas.length - 1]];
 }

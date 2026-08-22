@@ -33,10 +33,12 @@ export default function Inicio() {
     setGuardando(true);
     setErrorGuardado("");
     try {
-      const equipoCreado = await crearEquipo({ nombre, temporada });
-      setEquipos((actuales) =>
-        [...actuales, equipoCreado].sort((a, b) => a.nombre.localeCompare(b.nombre))
-      );
+      await crearEquipo({ nombre, temporada });
+      // Se vuelve a pedir la lista entera (en vez de solo añadir el nuevo al
+      // estado local) para que la caché offline de "equipos" quede al día;
+      // si no, se queda con la lista de antes de crear este equipo hasta la
+      // próxima carga con red que tenga éxito.
+      setEquipos(await listarEquipos());
       setMostrarAlta(false);
       setNombre("");
       setTemporada("");
@@ -65,6 +67,7 @@ export default function Inicio() {
                   <Link to={`/equipos/${equipo.id}/jugadores`}>Jugadores</Link>
                   <Link to={`/equipos/${equipo.id}/partido/nuevo`}>Iniciar partido</Link>
                   <Link to={`/equipos/${equipo.id}/partidos`}>Ver partidos</Link>
+                  <Link to={`/equipos/${equipo.id}/estadisticas`}>Estadísticas de temporada</Link>
                 </div>
               </article>
             ))}

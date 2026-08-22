@@ -19,7 +19,7 @@ export default function PanelContexto({
     <section className={`panel-contexto panel-contexto--${variant}`}>
       <h2 className="panel-contexto__titulo">{titulo}</h2>
       <ResumenCifras resumen={resumen} />
-      <GrupoBarras titulo="Situación ofensiva" datos={desgloseSituacion} variant={variant} />
+      <GrupoBarras titulo="Situación ofensiva" datos={desgloseSituacion} variant={variant} mostrarPosesion />
       <GrupoBarras titulo={tituloFormacion} datos={desgloseFormacion} variant={variant} />
       <OtrasAcciones resumen={resumen} />
       <MapaEficacia
