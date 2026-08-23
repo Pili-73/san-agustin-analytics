@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useEstadisticasJugador } from "../estado/useEstadisticasJugador";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useHojaEstadisticas } from "../estado/useHojaEstadisticas";
 import { useCargaAsync } from "../estado/useCargaAsync";
 import { obtenerPartido } from "../datos/partidos";
 import { obtenerEquipo } from "../datos/equipos";
@@ -8,23 +8,10 @@ import { listarJugadoresEquipo } from "../datos/jugadores";
 import BotonVolver from "../piezas/comun/BotonVolver";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
 import AvisoSinConexion from "../piezas/comun/AvisoSinConexion";
-import ResumenCifras from "../piezas/analisis/ResumenCifras";
+import SelectorJugadores from "../piezas/analisis/SelectorJugadores";
+import PanelJugador from "../piezas/analisis/PanelJugador";
 import FiltroTiempo from "../piezas/analisis/FiltroTiempo";
-import MapaEficacia from "../piezas/analisis/MapaEficacia";
 import "../estilos/Estadisticas.css";
-
-const FILAS_ACCIONES = [
-  { clave: "perdidas", titulo: "Pérdidas" },
-  { clave: "infracciones", titulo: "Infracciones" },
-  { clave: "faltasAtaque", titulo: "Faltas de ataque" },
-  { clave: "faltasRecibidas", titulo: "Faltas recibidas" },
-  { clave: "bloqueos", titulo: "Bloqueos" },
-  { clave: "intercepciones", titulo: "Intercepciones" },
-  { clave: "unoVsUno", titulo: "1 vs 1" },
-  { clave: "dosVsDos", titulo: "2 vs 2" },
-  { clave: "penaltis", titulo: "7 m" },
-  { clave: "exclusiones", titulo: "Exclusiones" },
-];
 
 async function cargarDatos(partidoId) {
   const partido = await obtenerPartido(partidoId);
@@ -70,9 +57,7 @@ export default function EstadisticasJugador() {
   const esPortero = jugador?.posicion?.toLowerCase() === "portero";
 
   const [rango, setRango] = useState(null);
-  const stats = useEstadisticasJugador(partidoId, jugadorIdNum, rango);
-  const statsLanzamientos = esPortero ? stats.estadisticasDefensa : stats.estadisticasAtaque;
-  const eficaciaZonas = esPortero ? stats.eficaciaZonasDefensa : stats.eficaciaZonasAtaque;
+  const stats = useHojaEstadisticas(partidoId, jugadorIdNum, rango);
 
   return (
     <div className="estadisticas">
@@ -90,23 +75,13 @@ export default function EstadisticasJugador() {
       ) : (
         <>
           {datos.jugadores.length > 0 && (
-            <nav className="jugadores-switch" aria-label="Cambiar de jugador">
-              {datos.jugadores.map((j) => (
-                <Link
-                  key={j.id}
-                  to={`/partidos/${partidoId}/estadisticas/jugador/${j.id}`}
-                  state={location.state}
-                  replace
-                  className={[
-                    "jugadores-switch__pill",
-                    j.id === jugadorIdNum ? "is-selected" : "",
-                    j.posicion?.toLowerCase() === "portero" ? "jugadores-switch__pill--portero" : "",
-                  ].filter(Boolean).join(" ")}
-                >
-                  <strong>{j.dorsal}</strong> {j.apellido}
-                </Link>
-              ))}
-            </nav>
+            <SelectorJugadores
+              jugadores={datos.jugadores}
+              seleccionadoId={jugadorIdNum}
+              enlaceJugador={(j) => `/partidos/${partidoId}/estadisticas/jugador/${j.id}`}
+              state={location.state}
+              aria="Cambiar de jugador"
+            />
           )}
 
           <EstadoCarga
@@ -114,49 +89,7 @@ export default function EstadisticasJugador() {
             error={errorDatos || stats.error}
             mensajeCargando="Cargando estadísticas…"
           >
-            {esPortero && (
-              <>
-                <div className="estadisticas__banda">
-                  PORTERÍA · {stats.estadisticasDefensa.pctParadas}% de eficacia
-                </div>
-                <ResumenCifras
-                  resumen={stats.estadisticasDefensa}
-                  titulos={["Recibidos", "Goles encajados", "Paradas", "Fueras"]}
-                />
-              </>
-            )}
-
-            {!esPortero && (
-              <>
-                <div className="estadisticas__banda">LANZAMIENTOS</div>
-                <ResumenCifras resumen={statsLanzamientos} />
-              </>
-            )}
-
-            <MapaEficacia
-              titulo={esPortero ? "Lanzamientos recibidos por zona" : "Eficacia por zona"}
-              porZonaPorteria={eficaciaZonas.porZonaPorteria}
-              porZonaLanz={eficaciaZonas.porZonaLanz}
-              variant={esPortero ? "defensa" : "ataque"}
-            />
-
-            <div className="estadisticas__banda">TODAS LAS ACCIONES</div>
-            <div className="otras-acciones__grid">
-              {FILAS_ACCIONES.map((fila) => (
-                <div className="otras-acciones__item" key={fila.clave}>
-                  <strong>{stats.todasLasAcciones[fila.clave]}</strong> {fila.titulo}
-                </div>
-              ))}
-            </div>
-
-            <div className="estadisticas__banda estadisticas__banda--sanciones">SANCIONES DEL JUGADOR</div>
-            <div className="estadisticas__sanciones">
-              <span><strong>{stats.sanciones.exclusiones}</strong> exclusiones (2 min)</span>
-              <span><strong>{stats.sanciones.amarillas}</strong> amarillas</span>
-              <span><strong>{stats.sanciones.rojas}</strong> rojas</span>
-              <span><strong>{stats.sanciones.azules}</strong> azules</span>
-            </div>
-
+            <PanelJugador stats={stats} esPortero={esPortero} tituloSanciones="SANCIONES DEL JUGADOR" />
             <FiltroTiempo rango={rango} onChange={setRango} maxMinutos={stats.maxMinutos} />
           </EstadoCarga>
         </>

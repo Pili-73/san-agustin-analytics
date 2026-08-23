@@ -118,8 +118,11 @@ export function usePartidoEnDirecto(partidoId) {
   };
 
   // Restaura un cronómetro guardado (p.ej. al volver de Estadísticas) sin pasar por minutos/segundos.
-  const restaurarElapsedMs = (ms) => {
+  // Si seguía en marcha al salir, además lo reanuda: el partido no se "pausa"
+  // por consultar estadísticas, el reloj sigue corriendo aunque no se vea.
+  const restaurarCronometro = (ms, corriendo) => {
     fijarElapsed(ms || 0);
+    if (corriendo) setRunning(true);
   };
 
   // Restaura el marcador guardado (p.ej. al volver de Estadísticas).
@@ -220,7 +223,7 @@ export function usePartidoEnDirecto(partidoId) {
     iniciarCronometro,
     pausarCronometro,
     establecerTiempoManual,
-    restaurarElapsedMs,
+    restaurarCronometro,
     restaurarMarcador,
     guardarAccion,
     deshacerUltimaAccion,

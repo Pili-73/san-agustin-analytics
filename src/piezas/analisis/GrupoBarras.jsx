@@ -1,10 +1,19 @@
 import { useState } from "react";
 import BarraDesglose from "./BarraDesglose";
 
-// Un grupo de barras desplegables (p.ej. "Situación ofensiva"). Solo una
-// puede estar abierta a la vez, como un acordeón.
-export default function GrupoBarras({ titulo, datos, variant, mostrarPosesion }) {
-  const [abierto, setAbierto] = useState(null);
+// Un grupo de barras desplegables (p.ej. "Situación ofensiva"). Se pueden
+// abrir varias a la vez, para poder compararlas.
+export default function GrupoBarras({ titulo, datos, variant, eficaciaZonas7m }) {
+  const [abiertos, setAbiertos] = useState(() => new Set());
+
+  const alternar = (value) => {
+    setAbiertos((actuales) => {
+      const siguiente = new Set(actuales);
+      if (siguiente.has(value)) siguiente.delete(value);
+      else siguiente.add(value);
+      return siguiente;
+    });
+  };
 
   return (
     <div className="grupo-barras">
@@ -14,9 +23,9 @@ export default function GrupoBarras({ titulo, datos, variant, mostrarPosesion })
           key={fila.value}
           fila={fila}
           variant={variant}
-          abierto={abierto === fila.value}
-          onToggle={() => setAbierto((actual) => (actual === fila.value ? null : fila.value))}
-          mostrarPosesion={mostrarPosesion}
+          abierto={abiertos.has(fila.value)}
+          onToggle={() => alternar(fila.value)}
+          eficaciaZonas7m={eficaciaZonas7m}
         />
       ))}
     </div>

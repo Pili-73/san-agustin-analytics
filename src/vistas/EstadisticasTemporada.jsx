@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEstadisticasTemporada } from "../estado/useEstadisticasTemporada";
 import { useCargaAsync } from "../estado/useCargaAsync";
 import { obtenerEquipo } from "../datos/equipos";
@@ -7,7 +7,9 @@ import { listarJugadoresEquipo } from "../datos/jugadores";
 import BotonVolver from "../piezas/comun/BotonVolver";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
 import AvisoSinConexion from "../piezas/comun/AvisoSinConexion";
-import PanelContexto from "../piezas/analisis/PanelContexto";
+import SelectorJugadores from "../piezas/analisis/SelectorJugadores";
+import PanelEquipo from "../piezas/analisis/PanelEquipo";
+import PanelJugador from "../piezas/analisis/PanelJugador";
 import FiltroFechas from "../piezas/analisis/FiltroFechas";
 import "../estilos/Estadisticas.css";
 
@@ -17,9 +19,9 @@ async function cargarDatos(idEquipo) {
 }
 
 // Una sola página para las estadísticas de temporada, de todo el equipo o de
-// un jugador concreto: seleccionar un jugador solo recalcula las cifras de
-// arriba, la cabecera y el filtro de fechas + lista de jugadores se quedan
-// siempre en el mismo sitio (la lista, al final del todo).
+// un jugador concreto: sin jugador seleccionado se ve la misma vista que
+// Estadísticas generales; con uno seleccionado, exactamente la misma vista
+// que Estadísticas por jugador. Tocar la píldora ya seleccionada deselecciona.
 export default function EstadisticasTemporada() {
   const navigate = useNavigate();
   const { equipoId, jugadorId } = useParams();
@@ -37,6 +39,7 @@ export default function EstadisticasTemporada() {
   const hoja = useEstadisticasTemporada(idEquipo, jugadorIdNum, rango);
 
   const jugadorSeleccionado = datos.jugadores.find((jugador) => jugador.id === jugadorIdNum);
+  const esPortero = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
 
   return (
     <div className="estadisticas">
@@ -53,6 +56,23 @@ export default function EstadisticasTemporada() {
 
       <AvisoSinConexion />
 
+      {datos.jugadores.length > 0 && (
+        <div className="temporada-selector-jugadores">
+          <SelectorJugadores
+            jugadores={datos.jugadores}
+            seleccionadoId={jugadorIdNum}
+            enlaceTodos={`/equipos/${idEquipo}/estadisticas`}
+            // Tocar la píldora ya seleccionada deselecciona y vuelve al equipo.
+            enlaceJugador={(jugador) =>
+              jugador.id === jugadorIdNum
+                ? `/equipos/${idEquipo}/estadisticas`
+                : `/equipos/${idEquipo}/estadisticas/jugador/${jugador.id}`
+            }
+            aria="Filtrar estadísticas de temporada por jugador"
+          />
+        </div>
+      )}
+
       <EstadoCarga
         cargando={cargandoDatos || hoja.cargando}
         error={errorDatos || hoja.error}
@@ -60,75 +80,14 @@ export default function EstadisticasTemporada() {
       >
         {hoja.partidos.length === 0 ? (
           <p className="estado-carga">Todavía no hay partidos registrados.</p>
+        ) : jugadorIdNum != null ? (
+          <PanelJugador stats={hoja} esPortero={esPortero} tituloSanciones="SANCIONES DEL JUGADOR" />
         ) : (
-          <>
-            <div className="estadisticas__comparativa">
-              <PanelContexto
-                variant="ataque"
-                titulo="ATAQUE"
-                resumen={hoja.estadisticasAtaque}
-                desgloseSituacion={hoja.desgloseSituacionAtaque}
-                desgloseFormacion={hoja.desgloseFormacionAtaque}
-                tituloFormacion="Defensa rival"
-                eficaciaZonas={hoja.eficaciaZonasAtaque}
-              />
-              <PanelContexto
-                variant="defensa"
-                titulo="DEFENSA"
-                resumen={hoja.estadisticasDefensa}
-                desgloseSituacion={hoja.desgloseSituacionDefensa}
-                desgloseFormacion={hoja.desgloseFormacionDefensa}
-                tituloFormacion="Defensa propia"
-                eficaciaZonas={hoja.eficaciaZonasDefensa}
-              />
-            </div>
+          <PanelEquipo hoja={hoja} tituloSanciones="NUESTRAS SANCIONES" />
+        )}
 
-            <div className="estadisticas__banda estadisticas__banda--sanciones">
-              {jugadorIdNum != null ? "SANCIONES DEL JUGADOR" : "NUESTRAS SANCIONES"}
-            </div>
-            <div className="estadisticas__sanciones">
-              <span><strong>{hoja.sanciones.exclusiones}</strong> exclusiones (2 min)</span>
-              <span><strong>{hoja.sanciones.amarillas}</strong> amarillas</span>
-              <span><strong>{hoja.sanciones.rojas}</strong> rojas</span>
-              <span><strong>{hoja.sanciones.azules}</strong> azules</span>
-            </div>
-
-            <FiltroFechas
-              rango={rango}
-              onChange={setRango}
-              fechaMin={hoja.rangoFechas[0]}
-              fechaMax={hoja.rangoFechas[1]}
-            />
-
-            {datos.jugadores.length > 0 && (
-              <>
-                <div className="estadisticas__banda">POR JUGADOR</div>
-                <nav className="jugadores-switch" aria-label="Filtrar estadísticas de temporada por jugador">
-                  <Link
-                    to={`/equipos/${idEquipo}/estadisticas`}
-                    replace
-                    className={`jugadores-switch__pill ${jugadorIdNum == null ? "is-selected" : ""}`}
-                  >
-                    Todo el equipo
-                  </Link>
-                  {datos.jugadores.map((jugador) => (
-                    <Link
-                      key={jugador.id}
-                      to={`/equipos/${idEquipo}/estadisticas/jugador/${jugador.id}`}
-                      replace
-                      className={[
-                        "jugadores-switch__pill",
-                        jugador.id === jugadorIdNum ? "is-selected" : "",
-                        jugador.posicion?.toLowerCase() === "portero" ? "jugadores-switch__pill--portero" : "",
-                      ].filter(Boolean).join(" ")}
-                    >
-                      <strong>{jugador.dorsal}</strong> {jugador.apellido}
-                    </Link>
-                  ))}
-                </nav>
-              </>
-            )}
-          </>
+        {hoja.partidos.length > 0 && (
+          <FiltroFechas rango={rango} onChange={setRango} fechaMin={hoja.rangoFechas[0]} fechaMax={hoja.rangoFechas[1]} />
         )}
       </EstadoCarga>
     </div>

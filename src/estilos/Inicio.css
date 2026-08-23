@@ -47,6 +47,30 @@
 .form-equipo label span { font-weight: 400; }
 .form-equipo input { min-height: 44px; padding: 0 10px; border: 1px solid #bbb; border-radius: 8px; font: inherit; }
 
+.temporada-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.temporada-selector label {
+  color: var(--color-texto-suave);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.temporada-selector select {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--color-gris-claro);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--color-texto);
+  font: 700 1rem/1 var(--fuente);
+  cursor: pointer;
+}
+
 .inicio h1 {
   margin: 32px 10px 0;
   color: var(--color-rojo);

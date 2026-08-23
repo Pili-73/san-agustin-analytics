@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { obtenerEquipo } from "../datos/equipos";
 import { listarJugadoresEquipo } from "../datos/jugadores";
@@ -8,6 +8,7 @@ import { useArrastrePlantilla } from "../estado/useArrastrePlantilla";
 import { formatearTiempo } from "../utils/tiempo";
 import { borrarEstadoDirecto, guardarEstadoDirecto, leerEstadoDirecto } from "../utils/estadoDirecto";
 import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
+import { colorOpcion } from "../utils/coloresAccion";
 import BarraMarcador from "../piezas/partido/BarraMarcador";
 import Modal from "../piezas/comun/Modal";
 import Toast from "../piezas/comun/Toast";
@@ -26,7 +27,7 @@ const OPCIONES_ACCION = [
     codigo: "ATQ",
     titulo: "Ataque",
     opciones: [
-      ["INF", "Infracción"], ["FAT", "F. ataque"], ["PER", "Pérdida"],
+      ["INF", "Infracción"], ["FAT", "Falta en ataque"], ["PER", "Pérdida"],
       ["FAL", "Falta"], ["BLQ", "Bloqueo"], ["1V1", "1v1"],
       ["2V2", "2v2"], ["2MIN", "2 min"], ["7M", "7 m"],
     ],
@@ -37,7 +38,7 @@ const OPCIONES_ACCION = [
     opciones: [
       ["1V1", "1v1"], ["2V2", "2v2"], ["7M", "7 m"],
       ["FAL", "Falta"],
-      ["BLQ", "Bloqueo"], ["INF", "Infracción"], ["FAT", "F. ataque"], ["INT", "Intercepción"],
+      ["BLQ", "Bloqueo"], ["INF", "Infracción"], ["FAT", "Falta en ataque"], ["INT", "Intercepción"],
     ],
   },
   {
@@ -48,21 +49,6 @@ const OPCIONES_ACCION = [
 ];
 
 const TIPOS_DEFENSA = ["6:0", "5:1", "3:3", "3:2:1"];
-
-function colorOpcion(codigo, fin) {
-  if (codigo === "SAN") {
-    return { "2MIN": "gris", AMARILLA: "amarillo", ROJA: "rojo", AZUL: "azul" }[fin];
-  }
-  if (codigo === "DEF") {
-    if (["1V1", "2V2", "7M"].includes(fin)) return "rojo";
-    if (["INF", "FAT", "INT"].includes(fin)) return "verde";
-    if (["FAL", "BLQ"].includes(fin)) return "blanco";
-    return "malo";
-  }
-  if (["FAL", "BLQ"].includes(fin)) return "blanco";
-  if (["1V1", "2V2", "2MIN", "7M"].includes(fin)) return "verde";
-  return "malo";
-}
 
 // Icono de cada opción: las sanciones usan el gesto de 2 dedos (2 min) o una
 // tarjeta (amarilla/roja/azul); el resto, un círculo de color.
@@ -124,7 +110,12 @@ export default function Directo() {
         setBanquilloIds(banquilloGuardado.length ? banquilloGuardado : jugadoresCargados.slice(7).map((j) => j.id));
         setTipoDefPropio(guardado.tipoDefPropio || "6:0");
         setTipoDefRival(guardado.tipoDefRival || "6:0");
-        partidoEnDirecto.restaurarElapsedMs(guardado.elapsedMs);
+        // Si el reloj seguía corriendo al salir a Estadísticas, sumamos el
+        // tiempo real transcurrido desde entonces (no se congela mientras no se ve).
+        const msTranscurridos = guardado.running && guardado.guardadoEnMs
+          ? (guardado.elapsedMs || 0) + (Date.now() - guardado.guardadoEnMs)
+          : (guardado.elapsedMs || 0);
+        partidoEnDirecto.restaurarCronometro(msTranscurridos, !!guardado.running);
         partidoEnDirecto.restaurarMarcador(guardado.golesAgustinos, guardado.golesRival);
         setParte(guardado.parte || 1);
       } else {
@@ -260,6 +251,8 @@ export default function Directo() {
   const verEstadisticas = (ruta) => {
     guardarEstadoDirecto(partidoId, {
       elapsedMs: partidoEnDirecto.elapsedMs,
+      running: partidoEnDirecto.running,
+      guardadoEnMs: Date.now(),
       golesAgustinos: partidoEnDirecto.marcador.golesAgustinos,
       golesRival: partidoEnDirecto.marcador.golesRival,
       tipoDefPropio,
@@ -268,28 +261,55 @@ export default function Directo() {
       banquilloIds,
       parte,
     });
-    navigate(ruta);
+    // replace (no push): así, al volver de Estadísticas, no queda una
+    // entrada de historial extra que se sume a la trampa del botón atrás
+    // (ver más abajo) y se vaya acumulando en cada ida y vuelta.
+    navigate(ruta, { replace: true });
   };
 
-  const finalizarPartido = () => {
+  // Devuelve true si el usuario confirmó y el partido se dio por finalizado
+  // (se usa tanto desde el botón "Fin partido" como desde el aviso al pulsar
+  // atrás, que necesita saber si debe reponer la entrada del historial).
+  const confirmarYFinalizar = () => {
     const avisoPendientes = totalPendientes
       ? `\n\nOjo: quedan ${totalPendientes} cambios sin subir (sin conexión). Se guardarán solos en cuanto vuelva la red; hasta entonces solo se ven en Estadísticas desde este mismo dispositivo.`
       : "";
-    if (window.confirm(`¿Estás seguro de acabar el partido?${avisoPendientes}`)) {
-      partidoEnDirecto.pausarCronometro();
-      borrarEstadoDirecto(partidoId);
-      navigate(`/equipos/${partido?.id_equipo}/partidos`);
-    }
+    if (!window.confirm(`¿Estás seguro de acabar el partido?${avisoPendientes}`)) return false;
+    partidoEnDirecto.pausarCronometro();
+    borrarEstadoDirecto(partidoId);
+    navigate(`/equipos/${partido?.id_equipo}/partidos`);
+    return true;
   };
+
+  const finalizarPartido = () => {
+    confirmarYFinalizar();
+  };
+
+  // Ref (no closure) para que el listener de popstate, montado una sola vez,
+  // siempre llame a la versión más reciente de confirmarYFinalizar (con el
+  // partido/pendientes actuales) en vez de quedarse con los del primer render.
+  const confirmarYFinalizarRef = useRef(confirmarYFinalizar);
+  useEffect(() => {
+    confirmarYFinalizarRef.current = confirmarYFinalizar;
+  });
+
+  // Botón atrás del móvil/tablet/navegador: mismo aviso que "Fin partido".
+  // Se añade una entrada extra al historial al entrar; al pulsar atrás se
+  // consume esa entrada (sin salir de verdad) y se muestra el aviso. Si el
+  // usuario cancela, se repone la entrada para poder atraparlo otra vez.
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+    const onPopState = () => {
+      if (!confirmarYFinalizarRef.current()) {
+        window.history.pushState(null, "", window.location.href);
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   return (
     <main className="partido-directo">
-      <Toast
-        key={partidoEnDirecto.avisoId}
-        mensaje={partidoEnDirecto.aviso}
-        tipo={partidoEnDirecto.avisoTipo}
-        onDismiss={partidoEnDirecto.limpiarAviso}
-      />
       <BarraMarcador
         equipo={equipo?.nombre}
         rival={partido?.rival}
@@ -333,19 +353,27 @@ export default function Directo() {
         </aside>
 
         <section className="panel-directo">
-          <div className="tipos-defensa">
-            <label className="tipos-defensa__pill tipos-defensa__pill--propia">
-              D. propia
-              <select value={tipoDefPropio} onChange={(event) => setTipoDefPropio(event.target.value)}>
-                {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
-              </select>
-            </label>
-            <label className="tipos-defensa__pill tipos-defensa__pill--rival">
-              D. rival
-              <select value={tipoDefRival} onChange={(event) => setTipoDefRival(event.target.value)}>
-                {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
-              </select>
-            </label>
+          <div className="tipos-defensa-envoltorio">
+            <Toast
+              key={partidoEnDirecto.avisoId}
+              mensaje={partidoEnDirecto.aviso}
+              tipo={partidoEnDirecto.avisoTipo}
+              onDismiss={partidoEnDirecto.limpiarAviso}
+            />
+            <div className="tipos-defensa">
+              <label className="tipos-defensa__pill tipos-defensa__pill--propia">
+                D. propia
+                <select value={tipoDefPropio} onChange={(event) => setTipoDefPropio(event.target.value)}>
+                  {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
+                </select>
+              </label>
+              <label className="tipos-defensa__pill tipos-defensa__pill--rival">
+                D. rival
+                <select value={tipoDefRival} onChange={(event) => setTipoDefRival(event.target.value)}>
+                  {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
+                </select>
+              </label>
+            </div>
           </div>
 
           {/* En pantallas anchas y bajas (tablet horizontal, ordenador) esta fila se

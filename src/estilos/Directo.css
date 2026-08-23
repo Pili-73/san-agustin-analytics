@@ -48,6 +48,13 @@
    solo como red de seguridad en ventanas muy bajas. */
 .panel-directo { display: flex; min-width: 0; min-height: 0; flex-direction: column; gap: 14px; padding: clamp(12px, 2vw, 24px); overflow-y: auto; }
 
+/* El aviso de "Acción guardada" aparece encima de la fila de tipos de
+   defensa (no del marcador, más arriba), con exactamente su mismo ancho: el
+   envoltorio no tiene padding propio, así que su caja coincide con la de
+   .tipos-defensa (su único hijo en flujo normal). */
+.tipos-defensa-envoltorio { position: relative; }
+.tipos-defensa-envoltorio > .toast { position: absolute; top: 0; left: 0; right: 0; transform: none; text-align: center; }
+
 .tipos-defensa { display: flex; flex-shrink: 0; justify-content: center; gap: 14px; }
 .tipos-defensa__pill { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border: 2px solid; border-radius: 24px; font-size: .8rem; font-weight: 700; }
 .tipos-defensa__pill select { min-height: 34px; padding: 0 8px; border: 0; border-radius: 18px; background: #fff; font: 700 .85rem/1 var(--fuente); }
@@ -131,15 +138,6 @@
 @media (min-width: 761px) {
   .grupo-accion__opciones button { min-height: 48px; padding: 10px 16px; font-size: 1.05rem; }
 }
-.indicador-color { width: 14px; height: 14px; flex: 0 0 14px; border: 1px solid #777; border-radius: 50%; }
-.indicador-color--rojo { background: var(--color-rojo); }
-.indicador-color--malo { background: var(--color-rojo-malo); }
-.indicador-color--blanco { background: #fff; }
-.indicador-color--verde { background: var(--color-verde); }
-.indicador-color--amarillo { background: var(--color-amarillo); }
-.indicador-color--azul { background: var(--color-azul); }
-.indicador-color--gris { background: var(--color-gris); }
-
 /* Iconos de sanción: gesto de 2 dedos (2 min) y tarjeta (amarilla/roja/azul). */
 .icono-2min { flex: 0 0 auto; font-size: 1.15rem; line-height: 1; }
 .icono-tarjeta { width: 11px; height: 15px; flex: 0 0 11px; border: 1px solid #777; border-radius: 2px; }
@@ -181,7 +179,11 @@
   .tipos-defensa__pill select { min-height: 28px; }
   .acciones-lanzamiento { gap: 8px; }
   .acciones-lanzamiento button { min-height: 38px; font-size: .88rem; }
-  .zona-juego { min-height: 100px; }
+  /* En móvil el ancho manda y el alto sale del aspect-ratio (al revés que en
+     escritorio): así la caja nunca se recorta con max-width sin ajustar el
+     alto, que es lo que desviaba la proporción real de la imagen y
+     desalineaba las zonas de portería/lanzamiento respecto a lo que se ve. */
+  .zona-juego { flex: 0 0 auto; align-self: stretch; width: 100%; max-width: 100%; min-height: 0; }
   .acciones-jugador { padding: 8px; }
   .acciones-jugador p { min-height: 0; margin: 0; font-size: .82rem; }
   .acciones-jugador__cabecera { margin-bottom: 6px; }
@@ -203,7 +205,6 @@
 /* Móviles muy estrechos: un pelín más compacto todavía. */
 @media (max-width: 400px) {
   .directo__contenido { grid-template-columns: minmax(104px, 30%) 1fr; }
-  .zona-juego { min-height: 80px; }
   .grupo-accion__cabecera { font-size: .68rem; padding: 0 4px; }
   .tipos-defensa__pill { font-size: .66rem; padding: 3px 5px 3px 8px; }
   .situaciones img { height: 26px; }

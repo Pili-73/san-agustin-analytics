@@ -4,6 +4,7 @@
 // (tiene `fin`). Ambos comparten `at_def_san`, `sit_ofensiva` y `tipo_def`.
 
 import { minutosDeTiempo } from "./tiempo";
+import { FIN_POR_CLAVE } from "./categoriasAccion";
 
 // Filtra por el minuto de partido en el que se registró cada acción (según
 // su `tiempo`, "mm:ss"). rango es [inicio, fin] en minutos, o null para no
@@ -51,6 +52,26 @@ function contar(lista, fin) {
   return lista.filter((accion) => accion.fin === fin).length;
 }
 
+// Cómo terminaron las acciones que no fueron lanzamiento: la posesión cambia
+// de manos, o sigue viva. Entre las dos cubren todos los tipos de evento sin
+// lanzamiento, así lanzamientos+cambiosPosesion+continuidades suma el total.
+function resumenPosesion(acciones) {
+  return {
+    cambiosPosesion:
+      contar(acciones, FIN_POR_CLAVE.perdidas) +
+      contar(acciones, FIN_POR_CLAVE.infracciones) +
+      contar(acciones, FIN_POR_CLAVE.faltasAtaque) +
+      contar(acciones, FIN_POR_CLAVE.intercepciones),
+    continuidades:
+      contar(acciones, FIN_POR_CLAVE.faltasRecibidas) +
+      contar(acciones, FIN_POR_CLAVE.bloqueos) +
+      contar(acciones, FIN_POR_CLAVE.unoVsUno) +
+      contar(acciones, FIN_POR_CLAVE.dosVsDos) +
+      contar(acciones, FIN_POR_CLAVE.penaltis) +
+      contar(acciones, FIN_POR_CLAVE.exclusiones),
+  };
+}
+
 // contexto: "ATQ" o "DEF". filtro: valor de sit_ofensiva o tipo_def, o null.
 export function calcularEstadisticas(todasLasAcciones, contexto, filtro) {
   const base = todasLasAcciones.filter((accion) => accion.at_def_san === contexto);
@@ -65,16 +86,20 @@ export function calcularEstadisticas(todasLasAcciones, contexto, filtro) {
   const paradas = acciones.filter((accion) => accion.gol_parada_fuera === "PAR").length;
   const fueras = acciones.filter((accion) => accion.gol_parada_fuera === "FUE").length;
 
-  const perdidas = contar(acciones, "PER");
-  const infracciones = contar(acciones, "INF");
-  const faltasAtaque = contar(acciones, "FAT");
-  const faltasRecibidas = contar(acciones, "FAL");
-  const bloqueos = contar(acciones, "BLQ");
-  const unoVsUno = contar(acciones, "1V1");
-  const dosVsDos = contar(acciones, "2V2");
-  const exclusiones = contar(acciones, "2MIN");
-  const penaltis = contar(acciones, "7M");
-  const intercepciones = contar(acciones, "INT");
+  const perdidas = contar(acciones, FIN_POR_CLAVE.perdidas);
+  const infracciones = contar(acciones, FIN_POR_CLAVE.infracciones);
+  const faltasAtaque = contar(acciones, FIN_POR_CLAVE.faltasAtaque);
+  const faltasRecibidas = contar(acciones, FIN_POR_CLAVE.faltasRecibidas);
+  const bloqueos = contar(acciones, FIN_POR_CLAVE.bloqueos);
+  const unoVsUno = contar(acciones, FIN_POR_CLAVE.unoVsUno);
+  const dosVsDos = contar(acciones, FIN_POR_CLAVE.dosVsDos);
+  const exclusiones = contar(acciones, FIN_POR_CLAVE.exclusiones);
+  const penaltis = contar(acciones, FIN_POR_CLAVE.penaltis);
+  const intercepciones = contar(acciones, FIN_POR_CLAVE.intercepciones);
+  // Ya contadas arriba: sumarlas es más barato que volver a recorrer
+  // `acciones` para los mismos códigos fin dentro de resumenPosesion.
+  const cambiosPosesion = perdidas + infracciones + faltasAtaque + intercepciones;
+  const continuidades = faltasRecibidas + bloqueos + unoVsUno + dosVsDos + penaltis + exclusiones;
 
   return {
     acciones: totalAcciones,
@@ -106,6 +131,10 @@ export function calcularEstadisticas(todasLasAcciones, contexto, filtro) {
     pctPenaltis: porcentaje(penaltis, totalAcciones),
     intercepciones,
     pctIntercepciones: porcentaje(intercepciones, totalAcciones),
+    cambiosPosesion,
+    pctCambiosPosesion: porcentaje(cambiosPosesion, totalAcciones),
+    continuidades,
+    pctContinuidades: porcentaje(continuidades, totalAcciones),
   };
 }
 
@@ -124,19 +153,7 @@ export function calcularDesglosePorCampo(todasLasAcciones, contexto, campo, opci
     const goles = acciones.filter((accion) => accion.gol_parada_fuera === "GOL").length;
     const paradas = acciones.filter((accion) => accion.gol_parada_fuera === "PAR").length;
     const fueras = acciones.filter((accion) => accion.gol_parada_fuera === "FUE").length;
-    // Solo se usan en el desglose de situación ofensiva: cómo terminó la
-    // posesión cuando no hubo lanzamiento (cambio de posesión) o cuando
-    // siguió viva (continuidad). Entre las dos cubren todos los tipos de
-    // evento sin lanzamiento, así lanzamientos+cambiosPosesion+continuidades
-    // suma siempre el total de la fila.
-    const cambiosPosesion = contar(acciones, "PER") + contar(acciones, "INF") + contar(acciones, "FAT") + contar(acciones, "INT");
-    const continuidades =
-      contar(acciones, "FAL") +
-      contar(acciones, "BLQ") +
-      contar(acciones, "1V1") +
-      contar(acciones, "2V2") +
-      contar(acciones, "7M") +
-      contar(acciones, "2MIN");
+    const { cambiosPosesion, continuidades } = resumenPosesion(acciones);
 
     return {
       value,
@@ -144,6 +161,7 @@ export function calcularDesglosePorCampo(todasLasAcciones, contexto, campo, opci
       cuenta,
       porcentaje: porcentaje(cuenta, total),
       lanzamientos,
+      pctLanzamientos: porcentaje(lanzamientos, cuenta),
       goles,
       pctGoles: porcentaje(goles, lanzamientos),
       paradas,
@@ -151,23 +169,11 @@ export function calcularDesglosePorCampo(todasLasAcciones, contexto, campo, opci
       fueras,
       pctFueras: porcentaje(fueras, lanzamientos),
       cambiosPosesion,
+      pctCambiosPosesion: porcentaje(cambiosPosesion, cuenta),
       continuidades,
+      pctContinuidades: porcentaje(continuidades, cuenta),
     };
   });
-}
-
-// Suma el detalle de ataque y defensa de un jugador en un único recuento por
-// categoría: en la vista por jugador no interesa separar contexto, solo
-// cuántas veces hizo cada cosa en todo el partido.
-const CATEGORIAS_ACCION = [
-  "perdidas", "infracciones", "faltasAtaque", "faltasRecibidas",
-  "bloqueos", "intercepciones", "unoVsUno", "dosVsDos", "penaltis", "exclusiones",
-];
-
-export function combinarPorCategoria(estadisticasAtaque, estadisticasDefensa) {
-  return Object.fromEntries(
-    CATEGORIAS_ACCION.map((clave) => [clave, estadisticasAtaque[clave] + estadisticasDefensa[clave]])
-  );
 }
 
 function zonasVacias() {
@@ -213,9 +219,14 @@ export function calcularSanciones(todasLasAcciones) {
 }
 
 // Todo el bloque de estadísticas derivadas de una lista de acciones ya
-// filtrada (un partido, o una temporada entera): lo usan tanto la hoja de un
-// partido como la de temporada, que solo difieren en cómo llegan a esa lista.
+// filtrada (un partido o una temporada entera, de todo el equipo o de un
+// jugador ya acotado): es la misma "hoja" que consumen la pantalla de
+// partido general, la de jugador y la de temporada, sea cual sea el origen.
 export function calcularHojaCompleta(acciones) {
+  // Un solo filtrado del subconjunto de 7m, reutilizado en ataque y defensa
+  // (antes se filtraba dos veces con el mismo predicado).
+  const acciones7m = acciones.filter((accion) => accion.sit_ofensiva === "7M");
+
   return {
     estadisticasAtaque: calcularEstadisticas(acciones, "ATQ", null),
     estadisticasDefensa: calcularEstadisticas(acciones, "DEF", null),
@@ -226,6 +237,8 @@ export function calcularHojaCompleta(acciones) {
     desgloseFormacionDefensa: calcularDesglosePorCampo(acciones, "DEF", "tipo_def", FILTROS_DEFENSA),
     eficaciaZonasAtaque: calcularEficaciaPorZonas(acciones, "ATQ"),
     eficaciaZonasDefensa: calcularEficaciaPorZonas(acciones, "DEF"),
+    eficaciaZonas7mAtaque: calcularEficaciaPorZonas(acciones7m, "ATQ"),
+    eficaciaZonas7mDefensa: calcularEficaciaPorZonas(acciones7m, "DEF"),
   };
 }
 

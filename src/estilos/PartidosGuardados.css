@@ -96,3 +96,14 @@
   color: var(--color-texto);
   font-size: clamp(1.45rem, 3vw, 2rem);
 }
+
+/* Pantalla pequeña: los botones se apilan a ancho completo en vez de
+   repartirse por parejas, así el texto queda siempre centrado de verdad. */
+@media (max-width: 480px) {
+  .ficha-partido__botones {
+    flex-direction: column;
+  }
+  .ficha-partido__boton {
+    min-width: 0;
+  }
+}

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { crearEquipo, listarEquipos } from "../datos/equipos";
 import { useCargaAsync } from "../estado/useCargaAsync";
+import { temporadaActual } from "../utils/temporada";
 import Modal from "../piezas/comun/Modal";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
 import "../estilos/Inicio.css";
@@ -13,11 +14,26 @@ export default function Inicio() {
   const [temporada, setTemporada] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [errorGuardado, setErrorGuardado] = useState("");
+  const [temporadaSeleccionada, setTemporadaSeleccionada] = useState(temporadaActual);
 
   const { cargando, error } = useCargaAsync(listarEquipos, {
     onExito: setEquipos,
     mensajeError: "No se pudieron cargar los equipos.",
   });
+
+  // El desplegable siempre ofrece la temporada actual, aunque todavía no
+  // haya ningún equipo dado de alta en ella, más las demás que aparezcan
+  // entre los equipos ya creados. Más reciente primero.
+  const temporadasDisponibles = useMemo(() => {
+    const distintas = new Set(equipos.map((equipo) => equipo.temporada).filter(Boolean));
+    distintas.add(temporadaActual());
+    return [...distintas].sort((a, b) => b.localeCompare(a));
+  }, [equipos]);
+
+  // "" (el valor de la opción "- Todas -") significa no filtrar.
+  const equiposDeLaTemporada = temporadaSeleccionada
+    ? equipos.filter((equipo) => equipo.temporada === temporadaSeleccionada)
+    : equipos;
 
   const cerrarAlta = () => {
     if (guardando) return;
@@ -57,7 +73,7 @@ export default function Inicio() {
       <section className="equipos" aria-label="Equipos">
         <EstadoCarga cargando={cargando} error={error} mensajeCargando="Cargando equipos…">
           <div className="equipos__carrusel">
-            {equipos.map((equipo) => (
+            {equiposDeLaTemporada.map((equipo) => (
               <article className="tarjeta-equipo" key={equipo.id}>
                 <div>
                   <h2>{equipo.nombre}</h2>
@@ -80,6 +96,18 @@ export default function Inicio() {
         </EstadoCarga>
       </section>
 
+      <div className="temporada-selector">
+        <label htmlFor="temporada-selector-input">Temporada</label>
+        <select
+          id="temporada-selector-input"
+          value={temporadaSeleccionada}
+          onChange={(event) => setTemporadaSeleccionada(event.target.value)}
+        >
+          <option value="">- Todas -</option>
+          {temporadasDisponibles.map((valor) => <option key={valor} value={valor}>{valor}</option>)}
+        </select>
+      </div>
+
       {mostrarAlta && (
         <Modal title="Añadir equipo" onClose={cerrarAlta}>
           <form className="form-equipo" onSubmit={guardarEquipo}>
@@ -89,7 +117,7 @@ export default function Inicio() {
             </label>
             <label>
               Temporada <span>(opcional)</span>
-              <input value={temporada} onChange={(event) => setTemporada(event.target.value)} placeholder="2026/2027" />
+              <input value={temporada} onChange={(event) => setTemporada(event.target.value)} placeholder="2026-2027" />
             </label>
             {errorGuardado && <p className="texto-error">{errorGuardado}</p>}
             <div className="modal-botones">

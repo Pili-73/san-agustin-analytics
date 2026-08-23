@@ -335,7 +335,7 @@
 
 .otras-acciones__item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
   padding: 6px 10px;
   border-radius: 8px;
@@ -350,6 +350,45 @@
 
 .otras-acciones__item span {
   color: var(--color-texto-suave);
+}
+
+/* Filas sin pareja en el orden pedido (p.ej. "Faltas en ataque"): ocupan
+   ellas solas una línea entera de la rejilla de 2 columnas. */
+.otras-acciones__item--completo {
+  grid-column: 1 / -1;
+}
+
+/* --- Acciones por contexto, en columnas (vista por jugador) --- */
+.acciones-contextos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+
+.acciones-contextos__titulo {
+  margin: 0 0 8px;
+  color: var(--color-texto-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.acciones-contextos__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (max-width: 420px) {
+  .acciones-contextos {
+    gap: 8px 8px;
+  }
+  .acciones-contextos .otras-acciones__item {
+    font-size: 0.76rem;
+    padding: 6px 8px;
+  }
 }
 
 /* --- Sanciones --- */
@@ -380,6 +419,12 @@
 .estadisticas__sanciones strong {
   color: var(--color-rojo-oscuro);
   font-size: 1.2rem;
+}
+
+/* Solo en Temporada: separación entre la lista de jugadores y la vista de
+   estadísticas (de equipo o de jugador) que aparece debajo. */
+.temporada-selector-jugadores {
+  margin-bottom: 20px;
 }
 
 /* --- Selector de jugador (entrada a estadísticas por jugador, y cambio
@@ -689,4 +734,53 @@
   fill: var(--color-texto);
   stroke: var(--color-texto);
   stroke-width: 0.35px;
+}
+
+/* --- Carrusel horizontal de paneles (mapa de zonas / mapa de 7 m) --- */
+.carrusel-paneles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.carrusel-paneles__pista {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.carrusel-paneles__pista::-webkit-scrollbar {
+  display: none;
+}
+
+.carrusel-paneles__panel {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.carrusel-paneles__puntos {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.carrusel-paneles__punto {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-gris);
+  cursor: pointer;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.carrusel-paneles__punto.is-activo {
+  width: 20px;
+  background: var(--color-rojo);
 }

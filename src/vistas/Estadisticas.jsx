@@ -7,7 +7,7 @@ import { obtenerEquipo } from "../datos/equipos";
 import BotonVolver from "../piezas/comun/BotonVolver";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
 import AvisoSinConexion from "../piezas/comun/AvisoSinConexion";
-import PanelContexto from "../piezas/analisis/PanelContexto";
+import PanelEquipo from "../piezas/analisis/PanelEquipo";
 import FiltroTiempo from "../piezas/analisis/FiltroTiempo";
 import "../estilos/Estadisticas.css";
 
@@ -38,7 +38,7 @@ export default function Estadisticas() {
   });
 
   const [rango, setRango] = useState(null);
-  const hoja = useHojaEstadisticas(partidoId, rango);
+  const hoja = useHojaEstadisticas(partidoId, null, rango);
 
   return (
     <div className="estadisticas">
@@ -52,35 +52,7 @@ export default function Estadisticas() {
       <AvisoSinConexion />
 
       <EstadoCarga cargando={hoja.cargando} error={hoja.error} mensajeCargando="Cargando estadísticas…">
-        <div className="estadisticas__comparativa">
-          <PanelContexto
-            variant="ataque"
-            titulo="ATAQUE"
-            resumen={hoja.estadisticasAtaque}
-            desgloseSituacion={hoja.desgloseSituacionAtaque}
-            desgloseFormacion={hoja.desgloseFormacionAtaque}
-            tituloFormacion="Defensa rival"
-            eficaciaZonas={hoja.eficaciaZonasAtaque}
-          />
-          <PanelContexto
-            variant="defensa"
-            titulo="DEFENSA"
-            resumen={hoja.estadisticasDefensa}
-            desgloseSituacion={hoja.desgloseSituacionDefensa}
-            desgloseFormacion={hoja.desgloseFormacionDefensa}
-            tituloFormacion="Defensa propia"
-            eficaciaZonas={hoja.eficaciaZonasDefensa}
-          />
-        </div>
-
-        <div className="estadisticas__banda estadisticas__banda--sanciones">NUESTRAS SANCIONES</div>
-        <div className="estadisticas__sanciones">
-          <span><strong>{hoja.sanciones.exclusiones}</strong> exclusiones (2 min)</span>
-          <span><strong>{hoja.sanciones.amarillas}</strong> amarillas</span>
-          <span><strong>{hoja.sanciones.rojas}</strong> rojas</span>
-          <span><strong>{hoja.sanciones.azules}</strong> azules</span>
-        </div>
-
+        <PanelEquipo hoja={hoja} tituloSanciones="NUESTRAS SANCIONES" />
         <FiltroTiempo rango={rango} onChange={setRango} maxMinutos={hoja.maxMinutos} />
       </EstadoCarga>
     </div>

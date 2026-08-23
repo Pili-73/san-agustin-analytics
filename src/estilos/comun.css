@@ -84,12 +84,14 @@
 }
 
 /* --- Toast --- */
+/* Translúcido (no un color sólido): en Directo flota justo encima del
+   marcador, y así no tapa del todo el marcador ni el tiempo mientras se ve. */
 .toast {
   position: fixed;
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  background: #323232;
+  background: rgb(50 50 50 / 85%);
   color: #fff;
   padding: 10px 20px;
   border-radius: 8px;
@@ -99,9 +101,9 @@
   animation: toast-fade 3s forwards;
 }
 
-.toast--ok { background: var(--color-verde); }
-.toast--pendiente { background: var(--color-amarillo); color: var(--color-texto); }
-.toast--error { background: var(--color-rojo-malo); }
+.toast--ok { background: rgb(60 127 67 / 85%); }
+.toast--pendiente { background: rgb(239 189 36 / 85%); color: var(--color-texto); }
+.toast--error { background: rgb(179 38 30 / 85%); }
 
 @keyframes toast-fade {
   0% {
@@ -188,3 +190,13 @@
   background: var(--color-rojo);
   color: #fff;
 }
+
+/* --- Indicador de color de una acción (Directo y listados de Estadísticas) --- */
+.indicador-color { width: 14px; height: 14px; flex: 0 0 14px; border: 1px solid #777; border-radius: 50%; }
+.indicador-color--rojo { background: var(--color-rojo); }
+.indicador-color--malo { background: var(--color-rojo-malo); }
+.indicador-color--blanco { background: #fff; }
+.indicador-color--verde { background: var(--color-verde); }
+.indicador-color--amarillo { background: var(--color-amarillo); }
+.indicador-color--azul { background: var(--color-azul); }
+.indicador-color--gris { background: var(--color-gris); }
