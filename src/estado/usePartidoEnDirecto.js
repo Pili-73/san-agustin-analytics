@@ -169,6 +169,29 @@ export function usePartidoEnDirecto(partidoId) {
     }
   };
 
+  // Sustituciones (entrada/salida de un jugador) y marcadores de fin de 1ª
+  // parte/partido: se guardan como filas de `accion` (at_def_san "SUS"), sin
+  // pasar por guardarAccion -no tocan el marcador ni "deshacer", que son
+  // solo para las jugadas anotadas con los botones de Ataque/Defensa/Gol-.
+  // tiempo: si no se indica, usa el reloj actual; "Fin primer tiempo" pasa
+  // "30:00" explícito porque el reloj aún no se habrá actualizado a tiempo.
+  const guardarSuceso = async (extra, tiempo) => {
+    if (!partidoId) return;
+    const payload = { id_partido: partidoId, at_def_san: "SUS", tiempo: tiempo || formatearTiempo(elapsedMs), ...extra };
+    try {
+      await crearAccion(payload);
+    } catch (err) {
+      if (esErrorDeRed(err)) {
+        setPendientes(encolarAccion(partidoId, payload).cola);
+        return;
+      }
+      console.error("Error guardando suceso de partido", err);
+    }
+  };
+
+  const guardarCambioJugador = (idJugador, tipo) => guardarSuceso({ id_jugador: idJugador, fin: tipo });
+  const guardarMarcadorFin = (tipo, tiempo) => guardarSuceso({ fin: tipo }, tiempo);
+
   // Deshace solo la última acción (no hay historial de varios pasos): borra
   // la fila si ya se sincronizó, o la quita de la cola si seguía pendiente.
   // Si el borrado falla por red, se encola igual que al guardar: se aplica
@@ -227,5 +250,7 @@ export function usePartidoEnDirecto(partidoId) {
     restaurarMarcador,
     guardarAccion,
     deshacerUltimaAccion,
+    guardarCambioJugador,
+    guardarMarcadorFin,
   };
 }

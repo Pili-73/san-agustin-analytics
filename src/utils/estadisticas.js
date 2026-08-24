@@ -242,6 +242,64 @@ export function calcularHojaCompleta(acciones) {
   };
 }
 
+// Minutos jugados por un jugador en UN partido, a partir de sus filas de
+// sustitución (at_def_san "SUS", fin "IN"/"OUT") y de los marcadores de fin
+// de partido/1ª parte de ese mismo partido (fin "FINP"/"FIN1", sin
+// id_jugador). acciones: todas las de ese partido (sin filtrar por jugador,
+// para poder ver esos marcadores). Empareja entradas y salidas en orden; una
+// entrada sin salida (se acabó el partido, o se cerró la app, con el
+// jugador en pista) se cierra en el marcador de fin de partido si existe,
+// si no en el de fin de 1ª parte (30:00), y si no hay ninguno de los dos en
+// la última acción registrada del partido (lo último que se sabe seguro).
+export function calcularMinutosJugador(acciones, jugadorId) {
+  const cambios = acciones
+    .filter((accion) => accion.at_def_san === "SUS" && accion.id_jugador === jugadorId && (accion.fin === "IN" || accion.fin === "OUT"))
+    .map((accion) => ({ tipo: accion.fin, minutos: minutosDeTiempo(accion.tiempo) }))
+    .filter((cambio) => cambio.minutos != null)
+    .sort((a, b) => a.minutos - b.minutos);
+
+  const finPartido = acciones.find((accion) => accion.at_def_san === "SUS" && accion.fin === "FINP");
+  const finPrimeraParte = acciones.find((accion) => accion.at_def_san === "SUS" && accion.fin === "FIN1");
+  const techo = finPartido
+    ? minutosDeTiempo(finPartido.tiempo)
+    : finPrimeraParte
+    ? 30
+    : calcularMaxMinutos(acciones);
+
+  const intervalos = [];
+  let inicio = null;
+  for (const cambio of cambios) {
+    if (cambio.tipo === "IN" && inicio == null) inicio = cambio.minutos;
+    else if (cambio.tipo === "OUT" && inicio != null) {
+      intervalos.push([inicio, cambio.minutos]);
+      inicio = null;
+    }
+    // Entradas/salidas duplicadas por error (dos IN seguidos, un OUT sin
+    // IN previo) se ignoran en vez de romper el emparejamiento.
+  }
+  if (inicio != null) intervalos.push([inicio, Math.max(inicio, techo)]);
+
+  const totalMinutos = intervalos.reduce((suma, [ini, fin]) => suma + (fin - ini), 0);
+  return { intervalos, totalMinutos };
+}
+
+// Suma de minutos jugados por un jugador a lo largo de varios partidos (p.ej.
+// toda una temporada, ya filtrada por fecha): calcula el emparejamiento
+// IN/OUT por separado en cada partido -no se puede mezclar acciones de
+// partidos distintos- y suma los totales.
+export function calcularMinutosTemporada(acciones, jugadorId) {
+  const porPartido = new Map();
+  for (const accion of acciones) {
+    if (!porPartido.has(accion.id_partido)) porPartido.set(accion.id_partido, []);
+    porPartido.get(accion.id_partido).push(accion);
+  }
+  let total = 0;
+  for (const accionesPartido of porPartido.values()) {
+    total += calcularMinutosJugador(accionesPartido, jugadorId).totalMinutos;
+  }
+  return total;
+}
+
 // Filtra acciones de varios partidos por la fecha del partido al que
 // pertenece cada una (no existe fecha en `accion`, solo el minuto de
 // partido en `tiempo`). partidoPorId: { [id_partido]: { fecha, ... } }.

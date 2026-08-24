@@ -3,7 +3,10 @@ import { useState } from "react";
 // Arrastre con pointer events (ratón y táctil) para reordenar/mover ids entre
 // dos listas — en Directo, "en el campo" y "banquillo". No usa la API nativa
 // de drag-and-drop porque no funciona bien en dispositivos táctiles.
-export function useArrastrePlantilla({ campo, banquillo, setCampo, setBanquillo }) {
+// onCambioLista(id, tipo): opcional, se llama solo cuando el jugador cruza
+// de lista de verdad (no al reordenar dentro de la misma), con tipo "IN" si
+// entra a campo o "OUT" si sale a banquillo — para registrar minutos jugados.
+export function useArrastrePlantilla({ campo, banquillo, setCampo, setBanquillo, onCambioLista }) {
   const [arrastre, setArrastre] = useState(null); // { id, origen }
   const [zonaSobrevolada, setZonaSobrevolada] = useState(null); // { lista, targetId, before }
 
@@ -55,6 +58,7 @@ export function useArrastrePlantilla({ campo, banquillo, setCampo, setBanquillo 
         } else {
           setListaActual(arrastre.origen)(origenArr);
           setListaActual(destinoLista)(destinoArr);
+          onCambioLista?.(arrastre.id, destinoLista === "campo" ? "IN" : "OUT");
         }
       }
     }

@@ -3,6 +3,7 @@ import ResumenCifras from "./ResumenCifras";
 import MapaEficacia from "./MapaEficacia";
 import ListaAcciones from "./ListaAcciones";
 import BandaSanciones from "./BandaSanciones";
+import MinutosJugados from "./MinutosJugados";
 
 // Vista "por jugador": resumen de lanzamientos, carrusel de mapas de zona
 // (todos los lanzamientos / solo 7 m), todas las acciones por contexto, y
@@ -31,6 +32,8 @@ export default function PanelJugador({ stats, esPortero, tituloSanciones }) {
 
   return (
     <>
+      <MinutosJugados minutosJugados={stats.minutosJugados} />
+
       {esPortero ? (
         <>
           <div className="estadisticas__banda">PORTERÍA · {stats.estadisticasDefensa.pctParadas}% de eficacia</div>

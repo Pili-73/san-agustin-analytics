@@ -736,6 +736,43 @@
   stroke-width: 0.35px;
 }
 
+/* --- Minutos jugados --- */
+.minutos-jugados {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 20px;
+}
+
+.minutos-jugados__total {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--color-texto-suave);
+}
+
+.minutos-jugados__total strong {
+  font-size: 1.6rem;
+  color: var(--color-texto);
+}
+
+.minutos-jugados__intervalos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.minutos-jugados__intervalo {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-gris-claro);
+  background: #fff;
+  color: var(--color-texto);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 /* --- Carrusel horizontal de paneles (mapa de zonas / mapa de 7 m) --- */
 .carrusel-paneles {
   display: flex;

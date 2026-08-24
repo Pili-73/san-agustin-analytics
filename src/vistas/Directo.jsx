@@ -3,9 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { obtenerEquipo } from "../datos/equipos";
 import { listarJugadoresEquipo } from "../datos/jugadores";
 import { obtenerPartido } from "../datos/partidos";
+import { listarAccionesPartido } from "../datos/acciones";
 import { usePartidoEnDirecto } from "../estado/usePartidoEnDirecto";
 import { useArrastrePlantilla } from "../estado/useArrastrePlantilla";
-import { formatearTiempo } from "../utils/tiempo";
+import { formatearTiempo, minutosDeTiempo, msDeTiempo } from "../utils/tiempo";
 import { borrarEstadoDirecto, guardarEstadoDirecto, leerEstadoDirecto } from "../utils/estadoDirecto";
 import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
 import { colorOpcion } from "../utils/coloresAccion";
@@ -119,8 +120,29 @@ export default function Directo() {
         partidoEnDirecto.restaurarMarcador(guardado.golesAgustinos, guardado.golesRival);
         setParte(guardado.parte || 1);
       } else {
-        setCampoIds(jugadoresCargados.slice(0, 7).map((jugador) => jugador.id));
-        setBanquilloIds(jugadoresCargados.slice(7).map((jugador) => jugador.id));
+        // Al iniciar o reanudar un partido, todos los jugadores empiezan en
+        // el banquillo: el entrenador arrastra a los que salen de inicio.
+        setCampoIds([]);
+        setBanquilloIds(jugadoresCargados.map((jugador) => jugador.id));
+
+        // Sin snapshot de sesión (partido recién creado, o se volvió a abrir
+        // tras cerrar la app a mitad desde "Reanudar partido"): reconstruimos
+        // reloj, parte y marcador a partir de lo que ya haya en la base de
+        // datos. En un partido sin acciones todavía esto no cambia nada
+        // (sigue arrancando en 0:00, 1ª parte, 0-0).
+        const acciones = await listarAccionesPartido(partidoId);
+        if (!activo) return;
+        const ultimaAccion = acciones.reduce((actual, accion) => {
+          const minutos = minutosDeTiempo(accion.tiempo);
+          return minutos != null && (!actual || minutos > actual.minutos) ? { accion, minutos } : actual;
+        }, null);
+        if (ultimaAccion) {
+          partidoEnDirecto.restaurarCronometro(msDeTiempo(ultimaAccion.accion.tiempo), false);
+          setParte(ultimaAccion.minutos >= 30 ? 2 : 1);
+        }
+        const golesAgustinos = acciones.filter((accion) => accion.at_def_san === "ATQ" && accion.gol_parada_fuera === "GOL").length;
+        const golesRival = acciones.filter((accion) => accion.at_def_san === "DEF" && accion.gol_parada_fuera === "GOL").length;
+        partidoEnDirecto.restaurarMarcador(golesAgustinos, golesRival);
       }
     }).catch((err) => {
       console.error("Error cargando el partido en directo", err);
@@ -158,6 +180,7 @@ export default function Directo() {
     banquillo: banquilloIds,
     setCampo: setCampoIds,
     setBanquillo: setBanquilloIds,
+    onCambioLista: (idJugador, tipo) => partidoEnDirecto.guardarCambioJugador(idJugador, tipo),
   });
 
   const tipoDefPara = (codigo) => {
@@ -231,6 +254,7 @@ export default function Directo() {
     if (!window.confirm("¿Finalizar el primer tiempo?")) return;
     partidoEnDirecto.pausarCronometro();
     partidoEnDirecto.establecerTiempoManual(30, 0);
+    partidoEnDirecto.guardarMarcadorFin("FIN1", "30:00");
     setParte(2);
     setMenuMarcador(false);
     // Se guarda aquí mismo (no solo al ir a Estadísticas): si el cronómetro
@@ -276,6 +300,7 @@ export default function Directo() {
       : "";
     if (!window.confirm(`¿Estás seguro de acabar el partido?${avisoPendientes}`)) return false;
     partidoEnDirecto.pausarCronometro();
+    partidoEnDirecto.guardarMarcadorFin("FINP");
     borrarEstadoDirecto(partidoId);
     navigate(`/equipos/${partido?.id_equipo}/partidos`);
     return true;

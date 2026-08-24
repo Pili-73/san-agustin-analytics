@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { listarAccionesPartido } from "../datos/acciones";
 import { useCargaAsync } from "./useCargaAsync";
 import { supabase } from "../lib/supabase";
-import { calcularHojaCompleta, calcularMaxMinutos, filtrarPorTiempo } from "../utils/estadisticas";
+import { calcularHojaCompleta, calcularMaxMinutos, calcularMinutosJugador, filtrarPorTiempo } from "../utils/estadisticas";
 
 // jugadorId: null para las estadísticas de todo el equipo, o un id para las
 // de un jugador concreto — es la misma página y el mismo cálculo
@@ -57,5 +57,12 @@ export function useHojaEstadisticas(partidoId, jugadorId = null, rango = null) {
   const accionesFiltradas = useMemo(() => filtrarPorTiempo(accionesBase, rango), [accionesBase, rango]);
   const hoja = useMemo(() => calcularHojaCompleta(accionesFiltradas), [accionesFiltradas]);
 
-  return { cargando, error, maxMinutos, ...hoja };
+  // Sobre `acciones` sin acotar por jugador: necesita ver también los
+  // marcadores de fin de partido/1ª parte (sin id_jugador) de este partido.
+  const minutosJugados = useMemo(
+    () => (jugadorId ? calcularMinutosJugador(acciones, jugadorId) : null),
+    [acciones, jugadorId]
+  );
+
+  return { cargando, error, maxMinutos, minutosJugados, ...hoja };
 }
