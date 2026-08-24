@@ -98,7 +98,7 @@
   font-size: 0.9rem;
   font-weight: 700;
   z-index: 40;
-  animation: toast-fade 3s forwards;
+  animation: toast-fade 2s forwards;
 }
 
 .toast--ok { background: rgb(60 127 67 / 85%); }
