@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { listarAccionesPartido } from "../datos/acciones";
 import { useCargaAsync } from "./useCargaAsync";
+import { supabase } from "../lib/supabase";
 import { calcularHojaCompleta, calcularMaxMinutos, filtrarPorTiempo } from "../utils/estadisticas";
 
 // jugadorId: null para las estadísticas de todo el equipo, o un id para las
@@ -19,6 +20,31 @@ export function useHojaEstadisticas(partidoId, jugadorId = null, rango = null) {
       mensajeError: "No se pudieron cargar las estadísticas.",
     }
   );
+
+  // Otro dispositivo puede seguir anotando el mismo partido mientras esta
+  // pantalla está abierta. Nos suscribimos a los cambios de `accion` de este
+  // partido y recargamos la lista al vuelo, sin depender de que se navegue
+  // fuera y se vuelva a entrar para ver algo actualizado.
+  useEffect(() => {
+    if (!partidoId) return;
+
+    const canal = supabase
+      .channel(`accion-partido-${partidoId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "accion", filter: `id_partido=eq.${partidoId}` },
+        () => {
+          listarAccionesPartido(partidoId)
+            .then(setAcciones)
+            .catch((err) => console.error("No se pudo actualizar en directo", err));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(canal);
+    };
+  }, [partidoId]);
 
   // maxMinutos se calcula sobre todas las acciones del partido (no las
   // filtradas por jugador ni por tiempo), para que la barra de intervalo no
