@@ -63,6 +63,21 @@
   background: var(--color-azul);
 }
 
+/* En "Reanudar partido" la ficha entera es el enlace (una sola acción),
+   así que le quita el subrayado de <a> por defecto y añade el mismo hover
+   que ya tienen los botones de estadísticas. */
+.ficha-partido--reanudar {
+  display: grid;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ficha-partido--reanudar:hover {
+  box-shadow: 0 4px 14px rgb(0 0 0 / 14%);
+  transform: translateY(-1px);
+}
+
 .ficha-partido strong {
   grid-column: 1;
   font-size: 1.2rem;

@@ -82,6 +82,7 @@ export default function Inicio() {
                 <div className="tarjeta-equipo__acciones">
                   <Link to={`/equipos/${equipo.id}/jugadores`}>Jugadores</Link>
                   <Link to={`/equipos/${equipo.id}/partido/nuevo`}>Iniciar partido</Link>
+                  <Link to={`/equipos/${equipo.id}/partido/reanudar`}>Reanudar partido</Link>
                   <Link to={`/equipos/${equipo.id}/partidos`}>Ver partidos</Link>
                   <Link to={`/equipos/${equipo.id}/estadisticas`}>Estadísticas de temporada</Link>
                 </div>

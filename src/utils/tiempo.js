@@ -14,6 +14,14 @@ export function minutosDeTiempo(tiempo) {
   return mm + ss / 60;
 }
 
+// Inversa de formatearTiempo: de "mm:ss" a milisegundos, para restaurar el
+// cronómetro a partir del tiempo guardado en la última acción de un
+// partido. null si no es parseable.
+export function msDeTiempo(tiempo) {
+  const minutos = minutosDeTiempo(tiempo);
+  return minutos != null ? Math.round(minutos * 60000) : null;
+}
+
 export function fechaDeHoy() {
   // yyyy-MM-dd, formato nativo de <input type="date"> y de la columna "date" en Supabase
   return new Date().toISOString().slice(0, 10);
