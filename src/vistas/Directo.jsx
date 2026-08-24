@@ -291,31 +291,46 @@ export default function Directo() {
     navigate(ruta, { replace: true });
   };
 
-  // Devuelve true si el usuario confirmó y el partido se dio por finalizado
-  // (se usa tanto desde el botón "Fin partido" como desde el aviso al pulsar
-  // atrás, que necesita saber si debe reponer la entrada del historial).
-  const confirmarYFinalizar = () => {
+  const mensajeConfirmarFin = () => {
     const avisoPendientes = totalPendientes
       ? `\n\nOjo: quedan ${totalPendientes} cambios sin subir (sin conexión). Se guardarán solos en cuanto vuelva la red; hasta entonces solo se ven en Estadísticas desde este mismo dispositivo.`
       : "";
-    if (!window.confirm(`¿Estás seguro de acabar el partido?${avisoPendientes}`)) return false;
+    return `¿Estás seguro de acabar el partido?${avisoPendientes}`;
+  };
+
+  // Guarda el estado final y sustituye (no añade) la entrada actual del
+  // historial por el listado de partidos: así, se llegue por el botón "Fin
+  // partido" o por el aviso al pulsar atrás, no queda ninguna entrada de
+  // Directo enterrada debajo sobre la que el botón atrás pueda volver a
+  // caer -esa es la causa del bucle Directo↔listado que reportaste-.
+  const finalizarYNavegar = () => {
     partidoEnDirecto.pausarCronometro();
     partidoEnDirecto.guardarMarcadorFin("FINP");
     borrarEstadoDirecto(partidoId);
-    navigate(`/equipos/${partido?.id_equipo}/partidos`);
-    return true;
+    navigate(`/equipos/${partido?.id_equipo}/partidos`, { replace: true });
   };
 
+  // El botón no puede sustituir directamente la entrada actual: mientras no
+  // se ha pulsado atrás, esa entrada sigue siendo la "trampa" añadida al
+  // montar (ver más abajo), y debajo de ella seguiría la entrada real de
+  // Directo. En vez de eso, se autoriza el siguiente popstate y se dispara
+  // uno mismo (atrás programático): así se reutiliza el mismo punto del
+  // historial -y la misma sustitución- que usa el aviso al pulsar atrás.
   const finalizarPartido = () => {
-    confirmarYFinalizar();
+    if (!window.confirm(mensajeConfirmarFin())) return;
+    finalizacionAutorizadaRef.current = true;
+    window.history.back();
   };
 
-  // Ref (no closure) para que el listener de popstate, montado una sola vez,
-  // siempre llame a la versión más reciente de confirmarYFinalizar (con el
-  // partido/pendientes actuales) en vez de quedarse con los del primer render.
-  const confirmarYFinalizarRef = useRef(confirmarYFinalizar);
+  // Refs (no closures) para que el listener de popstate, montado una sola
+  // vez, siempre use la versión más reciente de estas funciones (con el
+  // partido/pendientes actuales) en vez de quedarse con la del primer render.
+  const finalizarYNavegarRef = useRef(finalizarYNavegar);
+  const mensajeConfirmarFinRef = useRef(mensajeConfirmarFin);
+  const finalizacionAutorizadaRef = useRef(false);
   useEffect(() => {
-    confirmarYFinalizarRef.current = confirmarYFinalizar;
+    finalizarYNavegarRef.current = finalizarYNavegar;
+    mensajeConfirmarFinRef.current = mensajeConfirmarFin;
   });
 
   // Botón atrás del móvil/tablet/navegador: mismo aviso que "Fin partido".
@@ -325,7 +340,14 @@ export default function Directo() {
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
     const onPopState = () => {
-      if (!confirmarYFinalizarRef.current()) {
+      if (finalizacionAutorizadaRef.current) {
+        finalizacionAutorizadaRef.current = false;
+        finalizarYNavegarRef.current();
+        return;
+      }
+      if (window.confirm(mensajeConfirmarFinRef.current())) {
+        finalizarYNavegarRef.current();
+      } else {
         window.history.pushState(null, "", window.location.href);
       }
     };
