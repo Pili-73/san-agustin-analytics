@@ -170,6 +170,11 @@
   box-sizing: border-box;
 }
 
+.confirmacion__mensaje {
+  margin: 0;
+  white-space: pre-line;
+}
+
 .modal-botones {
   display: flex;
   justify-content: flex-end;

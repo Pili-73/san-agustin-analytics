@@ -10,6 +10,7 @@ import {
   listarJugadoresEquipo,
 } from "../datos/jugadores";
 import { useCargaAsync } from "../estado/useCargaAsync";
+import { useConfirmacion } from "../estado/useConfirmacion";
 import BotonVolver from "../piezas/comun/BotonVolver";
 import Modal from "../piezas/comun/Modal";
 import Toast from "../piezas/comun/Toast";
@@ -42,6 +43,7 @@ export default function Jugadores() {
   const [procesando, setProcesando] = useState(null); // id del jugador en curso (borrar/reactivar)
   const [errorBorrado, setErrorBorrado] = useState("");
   const [aviso, setAviso] = useState(null);
+  const { confirmar, dialogo: dialogoConfirmacion } = useConfirmacion();
 
   const { cargando, error } = useCargaAsync(
     () => Promise.all([obtenerEquipo(equipoId), listarJugadoresEquipo(equipoId, { incluirInactivos: true })]),
@@ -114,7 +116,7 @@ export default function Jugadores() {
 
   const borrarJugador = async (jugador) => {
     if (procesando) return;
-    if (!window.confirm(`¿Eliminar a ${jugador.nombre} ${jugador.apellido}?`)) return;
+    if (!(await confirmar(`¿Eliminar a ${jugador.nombre} ${jugador.apellido}?`))) return;
 
     setProcesando(jugador.id);
     setErrorBorrado("");
@@ -267,6 +269,7 @@ export default function Jugadores() {
           </form>
         </Modal>
       )}
+      {dialogoConfirmacion}
     </main>
   );
 }

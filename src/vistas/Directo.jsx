@@ -6,6 +6,7 @@ import { obtenerPartido } from "../datos/partidos";
 import { listarAccionesPartido } from "../datos/acciones";
 import { usePartidoEnDirecto } from "../estado/usePartidoEnDirecto";
 import { useArrastrePlantilla } from "../estado/useArrastrePlantilla";
+import { useConfirmacion } from "../estado/useConfirmacion";
 import { formatearTiempo, minutosDeTiempo, msDeTiempo } from "../utils/tiempo";
 import { borrarEstadoDirecto, guardarEstadoDirecto, leerEstadoDirecto } from "../utils/estadoDirecto";
 import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
@@ -68,6 +69,7 @@ export default function Directo() {
   const { id } = useParams();
   const partidoId = Number(id);
   const partidoEnDirecto = usePartidoEnDirecto(partidoId);
+  const { confirmar, dialogo: dialogoConfirmacion } = useConfirmacion();
   const [partido, setPartido] = useState(null);
   const [equipo, setEquipo] = useState(null);
   const [jugadores, setJugadores] = useState([]);
@@ -250,8 +252,8 @@ export default function Directo() {
   // El reloj sigue corriendo en continuo (0-60, no se reinicia por parte):
   // así el tiempo guardado en cada acción sitúa la 2ª parte en el minuto 30
   // en adelante, que es lo que usa el filtro de tiempo de Estadísticas.
-  const finalizarPrimerTiempo = () => {
-    if (!window.confirm("¿Finalizar el primer tiempo?")) return;
+  const finalizarPrimerTiempo = async () => {
+    if (!(await confirmar("¿Finalizar el primer tiempo?"))) return;
     partidoEnDirecto.pausarCronometro();
     partidoEnDirecto.establecerTiempoManual(30, 0);
     partidoEnDirecto.guardarMarcadorFin("FIN1", "30:00");
@@ -316,8 +318,8 @@ export default function Directo() {
   // Directo. En vez de eso, se autoriza el siguiente popstate y se dispara
   // uno mismo (atrás programático): así se reutiliza el mismo punto del
   // historial -y la misma sustitución- que usa el aviso al pulsar atrás.
-  const finalizarPartido = () => {
-    if (!window.confirm(mensajeConfirmarFin())) return;
+  const finalizarPartido = async () => {
+    if (!(await confirmar(mensajeConfirmarFin()))) return;
     finalizacionAutorizadaRef.current = true;
     window.history.back();
   };
@@ -339,13 +341,13 @@ export default function Directo() {
   // usuario cancela, se repone la entrada para poder atraparlo otra vez.
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
-    const onPopState = () => {
+    const onPopState = async () => {
       if (finalizacionAutorizadaRef.current) {
         finalizacionAutorizadaRef.current = false;
         finalizarYNavegarRef.current();
         return;
       }
-      if (window.confirm(mensajeConfirmarFinRef.current())) {
+      if (await confirmar(mensajeConfirmarFinRef.current())) {
         finalizarYNavegarRef.current();
       } else {
         window.history.pushState(null, "", window.location.href);
@@ -511,6 +513,7 @@ export default function Directo() {
         </div>
       </Modal>}
       {editarTiempo && <Modal title="Editar tiempo" onClose={() => setEditarTiempo(false)}><div className="modal-campos"><label>Minutos<input type="number" min="0" value={minInput} onChange={(event) => setMinInput(event.target.value)} /></label><label>Segundos<input type="number" min="0" max="59" value={segInput} onChange={(event) => setSegInput(event.target.value)} /></label></div><div className="modal-botones"><button type="button" onClick={() => setEditarTiempo(false)}>Cancelar</button><button type="button" className="btn-primario" onClick={confirmarTiempo}>Aceptar</button></div></Modal>}
+      {dialogoConfirmacion}
     </main>
   );
 }
