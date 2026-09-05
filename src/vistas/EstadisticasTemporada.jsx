@@ -89,6 +89,8 @@ export default function EstadisticasTemporada() {
             tituloSanciones="SANCIONES DEL JUGADOR"
             opcionesAtaque={opciones.opcionesPorContexto.ATQ}
             opcionesDefensa={opciones.opcionesPorContexto.DEF}
+            catalogoAtaque={opciones.catalogoPorContexto.ATQ}
+            catalogoDefensa={opciones.catalogoPorContexto.DEF}
           />
         ) : (
           <PanelEquipo
@@ -96,6 +98,8 @@ export default function EstadisticasTemporada() {
             tituloSanciones="NUESTRAS SANCIONES"
             opcionesAtaque={opciones.opcionesPorContexto.ATQ}
             opcionesDefensa={opciones.opcionesPorContexto.DEF}
+            catalogoAtaque={opciones.catalogoPorContexto.ATQ}
+            catalogoDefensa={opciones.catalogoPorContexto.DEF}
           />
         )}
 

@@ -4,7 +4,7 @@ import BandaSanciones from "./BandaSanciones";
 // Vista "generales": comparativa ataque/defensa de todo el equipo + sanciones.
 // La usan tanto la pantalla de un partido como la de temporada sin jugador
 // seleccionado.
-export default function PanelEquipo({ hoja, tituloSanciones, opcionesAtaque, opcionesDefensa }) {
+export default function PanelEquipo({ hoja, tituloSanciones, opcionesAtaque, opcionesDefensa, catalogoAtaque, catalogoDefensa }) {
   return (
     <>
       <div className="estadisticas__comparativa">
@@ -19,6 +19,7 @@ export default function PanelEquipo({ hoja, tituloSanciones, opcionesAtaque, opc
           eficaciaZonas7m={hoja.eficaciaZonas7mAtaque}
           opciones={opcionesAtaque}
           acciones={hoja.accionesAtaque}
+          catalogo={catalogoAtaque}
         />
         <PanelContexto
           variant="defensa"
@@ -31,6 +32,7 @@ export default function PanelEquipo({ hoja, tituloSanciones, opcionesAtaque, opc
           eficaciaZonas7m={hoja.eficaciaZonas7mDefensa}
           opciones={opcionesDefensa}
           acciones={hoja.accionesDefensa}
+          catalogo={catalogoDefensa}
         />
       </div>
       <BandaSanciones titulo={tituloSanciones} sanciones={hoja.sanciones} />

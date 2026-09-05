@@ -18,6 +18,7 @@ export default function PanelContexto({
   eficaciaZonas7m,
   opciones,
   acciones,
+  catalogo,
 }) {
   return (
     <section className={`panel-contexto panel-contexto--${variant}`}>
@@ -37,7 +38,7 @@ export default function PanelContexto({
         eficaciaZonas7m={eficaciaZonas7m}
       />
       <GrupoBarras titulo={tituloFormacion} datos={desgloseFormacion} variant={variant} />
-      <OtrasAcciones opciones={opciones} acciones={acciones} />
+      <OtrasAcciones opciones={opciones} acciones={acciones} catalogo={catalogo} />
       <MapaEficacia
         titulo="Eficacia por zona"
         porZonaPorteria={eficaciaZonas.porZonaPorteria}

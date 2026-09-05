@@ -10,7 +10,7 @@ import MinutosJugados from "./MinutosJugados";
 // sanciones. La usan tanto la pantalla de un partido como la de temporada
 // con un jugador seleccionado — stats es siempre una "hoja" de
 // calcularHojaCompleta, ya acotada a ese jugador.
-export default function PanelJugador({ stats, esPortero, tituloSanciones, opcionesAtaque, opcionesDefensa }) {
+export default function PanelJugador({ stats, esPortero, tituloSanciones, opcionesAtaque, opcionesDefensa, catalogoAtaque, catalogoDefensa }) {
   const variant = esPortero ? "defensa" : "ataque";
   const resumenLanz = esPortero ? stats.estadisticasDefensa : stats.estadisticasAtaque;
   const eficaciaZonas = esPortero ? stats.eficaciaZonasDefensa : stats.eficaciaZonasAtaque;
@@ -82,13 +82,13 @@ export default function PanelJugador({ stats, esPortero, tituloSanciones, opcion
         <div className="acciones-contextos__columna panel-contexto panel-contexto--ataque">
           <h3 className="acciones-contextos__titulo">Ataque</h3>
           <div className="acciones-contextos__lista">
-            <ListaAcciones opciones={opcionesAtaque} acciones={stats.accionesAtaque} />
+            <ListaAcciones opciones={opcionesAtaque} acciones={stats.accionesAtaque} catalogo={catalogoAtaque} />
           </div>
         </div>
         <div className="acciones-contextos__columna panel-contexto panel-contexto--defensa">
           <h3 className="acciones-contextos__titulo">Defensa</h3>
           <div className="acciones-contextos__lista">
-            <ListaAcciones opciones={opcionesDefensa} acciones={stats.accionesDefensa} />
+            <ListaAcciones opciones={opcionesDefensa} acciones={stats.accionesDefensa} catalogo={catalogoDefensa} />
           </div>
         </div>
       </div>

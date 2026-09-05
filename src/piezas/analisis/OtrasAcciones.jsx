@@ -2,12 +2,12 @@ import ListaAcciones from "./ListaAcciones";
 
 // Detalle secundario, oculto tras un desplegable para no saturar la vista
 // principal (que ya tiene las cifras clave y las barras).
-export default function OtrasAcciones({ opciones, acciones }) {
+export default function OtrasAcciones({ opciones, acciones, catalogo }) {
   return (
     <details className="otras-acciones">
       <summary>Ver todas las acciones</summary>
       <div className="otras-acciones__grid">
-        <ListaAcciones opciones={opciones} acciones={acciones} />
+        <ListaAcciones opciones={opciones} acciones={acciones} catalogo={catalogo} />
       </div>
     </details>
   );

@@ -30,5 +30,17 @@ export function useOpcionesAccion(idEquipo) {
     };
   }, [catalogo, seleccionIds]);
 
-  return { cargando, error, catalogo, seleccionIds, opcionesPorContexto };
+  // El catálogo completo por contexto (sin filtrar por la selección del
+  // equipo): sirve para poder poner título y color a una acción registrada
+  // con un dato que el equipo ya no tiene activo (o nunca lo tuvo), en vez
+  // de descartarla del recuento de "todas las acciones".
+  const catalogoPorContexto = useMemo(
+    () => ({
+      ATQ: catalogo.filter((opcion) => opcion.contexto === "ATQ").sort((a, b) => a.orden - b.orden),
+      DEF: catalogo.filter((opcion) => opcion.contexto === "DEF").sort((a, b) => a.orden - b.orden),
+    }),
+    [catalogo]
+  );
+
+  return { cargando, error, catalogo, seleccionIds, opcionesPorContexto, catalogoPorContexto };
 }

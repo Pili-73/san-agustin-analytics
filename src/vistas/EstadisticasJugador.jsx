@@ -98,6 +98,8 @@ export default function EstadisticasJugador() {
               tituloSanciones="SANCIONES DEL JUGADOR"
               opcionesAtaque={opciones.opcionesPorContexto.ATQ}
               opcionesDefensa={opciones.opcionesPorContexto.DEF}
+              catalogoAtaque={opciones.catalogoPorContexto.ATQ}
+              catalogoDefensa={opciones.catalogoPorContexto.DEF}
             />
             <FiltroTiempo rango={rango} onChange={setRango} maxMinutos={stats.maxMinutos} />
           </EstadoCarga>
