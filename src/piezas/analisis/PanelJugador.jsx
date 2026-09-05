@@ -32,8 +32,6 @@ export default function PanelJugador({ stats, esPortero, tituloSanciones, opcion
 
   return (
     <>
-      <MinutosJugados minutosJugados={stats.minutosJugados} />
-
       {esPortero ? (
         <>
           <div className="estadisticas__banda">PORTERÍA · {stats.estadisticasDefensa.pctParadas}% de eficacia</div>
@@ -95,6 +93,7 @@ export default function PanelJugador({ stats, esPortero, tituloSanciones, opcion
         </div>
       </div>
 
+      <MinutosJugados minutosJugados={stats.minutosJugados} />
       <BandaSanciones titulo={tituloSanciones} sanciones={stats.sanciones} />
     </>
   );

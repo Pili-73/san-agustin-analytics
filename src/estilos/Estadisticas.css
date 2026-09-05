@@ -739,16 +739,17 @@
 /* --- Minutos jugados --- */
 .minutos-jugados {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   padding: 4px 8px 20px;
 }
 
 .minutos-jugados__total {
+  flex-shrink: 0;
   margin: 0;
   font-size: 1.05rem;
   color: var(--color-texto-suave);
+  white-space: nowrap;
 }
 
 .minutos-jugados__total strong {
@@ -756,14 +757,23 @@
   color: var(--color-texto);
 }
 
+/* Los intervalos se deslizan en horizontal cuando no caben, sin empujar ni
+   encoger el total de la izquierda. */
+.minutos-jugados__intervalos-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
 .minutos-jugados__intervalos {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
   gap: 6px;
+  width: max-content;
 }
 
 .minutos-jugados__intervalo {
+  flex-shrink: 0;
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--color-gris-claro);

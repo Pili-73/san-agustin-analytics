@@ -16,10 +16,12 @@ export default function MinutosJugados({ minutosJugados }) {
         </p>
         {intervalos && (
           intervalos.length > 0 ? (
-            <div className="minutos-jugados__intervalos">
-              {intervalos.map(([inicio, fin], indice) => (
-                <span className="minutos-jugados__intervalo" key={indice}>{Math.floor(inicio)}-{Math.floor(fin)}</span>
-              ))}
+            <div className="minutos-jugados__intervalos-scroll">
+              <div className="minutos-jugados__intervalos">
+                {intervalos.map(([inicio, fin], indice) => (
+                  <span className="minutos-jugados__intervalo" key={indice}>{Math.floor(inicio)}-{Math.floor(fin)}</span>
+                ))}
+              </div>
             </div>
           ) : (
             <p className="estado-carga">No ha jugado en este partido.</p>
