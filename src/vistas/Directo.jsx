@@ -7,10 +7,10 @@ import { listarAccionesPartido } from "../datos/acciones";
 import { usePartidoEnDirecto } from "../estado/usePartidoEnDirecto";
 import { useArrastrePlantilla } from "../estado/useArrastrePlantilla";
 import { useConfirmacion } from "../estado/useConfirmacion";
+import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { formatearTiempo, minutosDeTiempo, msDeTiempo } from "../utils/tiempo";
 import { borrarEstadoDirecto, guardarEstadoDirecto, leerEstadoDirecto } from "../utils/estadoDirecto";
 import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
-import { colorOpcion } from "../utils/coloresAccion";
 import BarraMarcador from "../piezas/partido/BarraMarcador";
 import Modal from "../piezas/comun/Modal";
 import Toast from "../piezas/comun/Toast";
@@ -24,44 +24,28 @@ const SITUACIONES = [
   { valor: "7M", texto: "7 m", imagen: "/7m.jpg" },
 ];
 
-const OPCIONES_ACCION = [
-  {
-    codigo: "ATQ",
-    titulo: "Ataque",
-    opciones: [
-      ["INF", "Infracción"], ["FAT", "Falta en ataque"], ["PER", "Pérdida"],
-      ["FAL", "Falta"], ["BLQ", "Bloqueo"], ["1V1", "1v1"],
-      ["2V2", "2v2"], ["2MIN", "2 min"], ["7M", "7 m"],
-    ],
-  },
-  {
-    codigo: "DEF",
-    titulo: "Defensa",
-    opciones: [
-      ["1V1", "1v1"], ["2V2", "2v2"], ["7M", "7 m"],
-      ["FAL", "Falta"],
-      ["BLQ", "Bloqueo"], ["INF", "Infracción"], ["FAT", "Falta en ataque"], ["INT", "Intercepción"],
-    ],
-  },
-  {
-    codigo: "SAN",
-    titulo: "Sanciones",
-    opciones: [["2MIN", "2 min"], ["AMARILLA", "Amarilla"], ["ROJA", "Roja"], ["AZUL", "Azul"]],
-  },
-];
+// Grupo de sanciones: fijo, fuera del catálogo configurable por equipo.
+const GRUPO_SAN = {
+  codigo: "SAN",
+  titulo: "Sanciones",
+  opciones: [
+    ["2MIN", "2 min", "gris"], ["AMARILLA", "Amarilla", "amarillo"],
+    ["ROJA", "Roja", "rojo"], ["AZUL", "Azul", "azul"],
+  ],
+};
 
 const TIPOS_DEFENSA = ["6:0", "5:1", "3:3", "3:2:1"];
 
 // Icono de cada opción: las sanciones usan el gesto de 2 dedos (2 min) o una
 // tarjeta (amarilla/roja/azul); el resto, un círculo de color.
-function IndicadorOpcion({ codigo, fin }) {
+function IndicadorOpcion({ codigo, fin, color }) {
   if (codigo === "SAN" && fin === "2MIN") {
     return <span className="icono-2min" aria-hidden="true">✌️</span>;
   }
   if (codigo === "SAN") {
-    return <span className={`icono-tarjeta icono-tarjeta--${colorOpcion(codigo, fin)}`} aria-hidden="true" />;
+    return <span className={`icono-tarjeta icono-tarjeta--${color}`} aria-hidden="true" />;
   }
-  return <span className={`indicador-color indicador-color--${colorOpcion(codigo, fin)}`} aria-hidden="true" />;
+  return <span className={`indicador-color indicador-color--${color}`} aria-hidden="true" />;
 }
 
 export default function Directo() {
@@ -89,6 +73,7 @@ export default function Directo() {
   const [tiempoMuerto, setTiempoMuerto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
   const [errorCarga, setErrorCarga] = useState("");
+  const { opcionesPorContexto } = useOpcionesAccion(equipo?.id);
 
   useEffect(() => {
     let activo = true;
@@ -165,6 +150,25 @@ export default function Directo() {
     () => banquilloIds.map((id) => jugadoresPorId[id]).filter(Boolean),
     [banquilloIds, jugadoresPorId]
   );
+  // Los grupos Ataque/Defensa salen del catálogo configurado por el equipo
+  // (ver Configuración); Sanciones se queda fijo.
+  const gruposAccion = useMemo(
+    () => [
+      {
+        codigo: "ATQ",
+        titulo: "Ataque",
+        opciones: opcionesPorContexto.ATQ.map((opcion) => [opcion.fin, opcion.titulo, opcion.color]),
+      },
+      {
+        codigo: "DEF",
+        titulo: "Defensa",
+        opciones: opcionesPorContexto.DEF.map((opcion) => [opcion.fin, opcion.titulo, opcion.color]),
+      },
+      GRUPO_SAN,
+    ],
+    [opcionesPorContexto]
+  );
+
   const jugadorSeleccionado = jugadores.find((jugador) => jugador.id === seleccionado);
   const esPorteroSeleccionado = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
   const puedeGuardarLanzamiento = !!jugadorSeleccionado && !!zonaLanz && !!zonaPorteria && !partidoEnDirecto.guardando;
@@ -467,14 +471,14 @@ export default function Directo() {
               </div>
             </div>
             <div className="acciones-jugador__grupos">
-              {OPCIONES_ACCION.map((grupo) => (
+              {gruposAccion.map((grupo) => (
                 <div className={`grupo-accion grupo-accion--${grupo.codigo.toLowerCase()}`} key={grupo.codigo}>
                   <button type="button" className="grupo-accion__cabecera" onClick={() => setGrupoAbierto((actual) => actual === grupo.codigo ? null : grupo.codigo)} disabled={!jugadorSeleccionado}>
                     {grupo.titulo}
                     <span className="grupo-accion__flecha" aria-hidden="true">{grupoAbierto === grupo.codigo ? "▲" : "▼"}</span>
                   </button>
                   {grupoAbierto === grupo.codigo && <div className="grupo-accion__opciones">
-                    {grupo.opciones.map(([fin, texto]) => <button type="button" key={`${grupo.codigo}-${fin}`} onClick={() => guardarEvento(grupo.codigo, fin)} disabled={partidoEnDirecto.guardando}><IndicadorOpcion codigo={grupo.codigo} fin={fin} /><span className="grupo-accion__texto">{texto}</span></button>)}
+                    {grupo.opciones.map(([fin, texto, color]) => <button type="button" key={`${grupo.codigo}-${fin}`} onClick={() => guardarEvento(grupo.codigo, fin)} disabled={partidoEnDirecto.guardando}><IndicadorOpcion codigo={grupo.codigo} fin={fin} color={color} /><span className="grupo-accion__texto">{texto}</span></button>)}
                   </div>}
                 </div>
               ))}

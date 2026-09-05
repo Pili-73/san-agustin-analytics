@@ -1,22 +1,17 @@
-import { categoriasPorContexto } from "../../utils/categoriasAccion";
-import { colorOpcion } from "../../utils/coloresAccion";
-
-// Las categorías de acción de un contexto, cada una con el mismo color que
-// se usa al registrarla en Directo. Sin contenedor propio: el layout (grid,
-// columnas...) lo pone quien la use.
-// contexto: "ATQ" | "DEF" — decide qué título/clave llevan las filas que
-// varían por contexto (p.ej. "Pérdidas"/"Intercepciones") y su color.
-export default function ListaAcciones({ resumen, contexto }) {
+// Los datos de ataque/defensa activos para el equipo (según su
+// Configuración), cada uno con el mismo color que se usa al registrarlo en
+// Directo. Sin contenedor propio: el layout (grid, columnas...) lo pone
+// quien la use.
+// opciones: catálogo ya filtrado a este contexto (ATQ|DEF) y a lo activo
+// para el equipo. acciones: las acciones en bruto de ese mismo contexto.
+export default function ListaAcciones({ opciones, acciones }) {
   return (
     <>
-      {categoriasPorContexto(contexto).map((fila) => (
-        <div
-          className={`otras-acciones__item ${fila.anchoCompleto ? "otras-acciones__item--completo" : ""}`}
-          key={fila.clave}
-        >
-          <span className={`indicador-color indicador-color--${colorOpcion(contexto, fila.fin)}`} aria-hidden="true" />
-          <strong>{resumen[fila.clave]}</strong>
-          <span>{fila.titulo}</span>
+      {opciones.map((opcion) => (
+        <div className="otras-acciones__item" key={opcion.id}>
+          <span className={`indicador-color indicador-color--${opcion.color}`} aria-hidden="true" />
+          <strong>{acciones.filter((accion) => accion.fin === opcion.fin).length}</strong>
+          <span>{opcion.titulo}</span>
         </div>
       ))}
     </>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useHojaEstadisticas } from "../estado/useHojaEstadisticas";
+import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { useCargaAsync } from "../estado/useCargaAsync";
 import { obtenerPartido } from "../datos/partidos";
 import { obtenerEquipo } from "../datos/equipos";
@@ -19,7 +20,7 @@ async function cargarDatos(partidoId) {
     obtenerEquipo(partido.id_equipo),
     listarJugadoresEquipo(partido.id_equipo),
   ]);
-  return { equipoNombre: equipo.nombre, rival: partido.rival, jugadores };
+  return { equipoNombre: equipo.nombre, rival: partido.rival, jugadores, idEquipo: equipo.id };
 }
 
 export default function EstadisticasJugador() {
@@ -33,6 +34,7 @@ export default function EstadisticasJugador() {
     equipoNombre: location.state?.equipo || null,
     rival: location.state?.rival || null,
     jugadores: [],
+    idEquipo: null,
   });
 
   const { cargando: cargandoDatos, error: errorDatos } = useCargaAsync(() => cargarDatos(partidoId), {
@@ -58,6 +60,7 @@ export default function EstadisticasJugador() {
 
   const [rango, setRango] = useState(null);
   const stats = useHojaEstadisticas(partidoId, jugadorIdNum, rango);
+  const opciones = useOpcionesAccion(datos.idEquipo);
 
   return (
     <div className="estadisticas">
@@ -85,11 +88,17 @@ export default function EstadisticasJugador() {
           )}
 
           <EstadoCarga
-            cargando={cargandoDatos || stats.cargando || jugadorIdNum == null}
-            error={errorDatos || stats.error}
+            cargando={cargandoDatos || stats.cargando || opciones.cargando || jugadorIdNum == null}
+            error={errorDatos || stats.error || opciones.error}
             mensajeCargando="Cargando estadísticas…"
           >
-            <PanelJugador stats={stats} esPortero={esPortero} tituloSanciones="SANCIONES DEL JUGADOR" />
+            <PanelJugador
+              stats={stats}
+              esPortero={esPortero}
+              tituloSanciones="SANCIONES DEL JUGADOR"
+              opcionesAtaque={opciones.opcionesPorContexto.ATQ}
+              opcionesDefensa={opciones.opcionesPorContexto.DEF}
+            />
             <FiltroTiempo rango={rango} onChange={setRango} maxMinutos={stats.maxMinutos} />
           </EstadoCarga>
         </>

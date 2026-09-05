@@ -16,11 +16,9 @@ export default function PanelContexto({
   tituloFormacion,
   eficaciaZonas,
   eficaciaZonas7m,
+  opciones,
+  acciones,
 }) {
-  // El color de cada acción depende del código de contexto ("ATQ"/"DEF"),
-  // no del nombre de columna ("ataque"/"defensa") que decide el color de la barra.
-  const contexto = variant === "ataque" ? "ATQ" : "DEF";
-
   return (
     <section className={`panel-contexto panel-contexto--${variant}`}>
       <h2 className="panel-contexto__titulo">{titulo}</h2>
@@ -39,7 +37,7 @@ export default function PanelContexto({
         eficaciaZonas7m={eficaciaZonas7m}
       />
       <GrupoBarras titulo={tituloFormacion} datos={desgloseFormacion} variant={variant} />
-      <OtrasAcciones resumen={resumen} contexto={contexto} />
+      <OtrasAcciones opciones={opciones} acciones={acciones} />
       <MapaEficacia
         titulo="Eficacia por zona"
         porZonaPorteria={eficaciaZonas.porZonaPorteria}

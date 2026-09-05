@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEstadisticasTemporada } from "../estado/useEstadisticasTemporada";
+import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { useCargaAsync } from "../estado/useCargaAsync";
 import { obtenerEquipo } from "../datos/equipos";
 import { listarJugadoresEquipo } from "../datos/jugadores";
@@ -37,6 +38,7 @@ export default function EstadisticasTemporada() {
 
   const [rango, setRango] = useState(null);
   const hoja = useEstadisticasTemporada(idEquipo, jugadorIdNum, rango);
+  const opciones = useOpcionesAccion(idEquipo);
 
   const jugadorSeleccionado = datos.jugadores.find((jugador) => jugador.id === jugadorIdNum);
   const esPortero = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
@@ -74,16 +76,27 @@ export default function EstadisticasTemporada() {
       )}
 
       <EstadoCarga
-        cargando={cargandoDatos || hoja.cargando}
-        error={errorDatos || hoja.error}
+        cargando={cargandoDatos || hoja.cargando || opciones.cargando}
+        error={errorDatos || hoja.error || opciones.error}
         mensajeCargando="Cargando estadísticas de temporada…"
       >
         {hoja.partidos.length === 0 ? (
           <p className="estado-carga">Todavía no hay partidos registrados.</p>
         ) : jugadorIdNum != null ? (
-          <PanelJugador stats={hoja} esPortero={esPortero} tituloSanciones="SANCIONES DEL JUGADOR" />
+          <PanelJugador
+            stats={hoja}
+            esPortero={esPortero}
+            tituloSanciones="SANCIONES DEL JUGADOR"
+            opcionesAtaque={opciones.opcionesPorContexto.ATQ}
+            opcionesDefensa={opciones.opcionesPorContexto.DEF}
+          />
         ) : (
-          <PanelEquipo hoja={hoja} tituloSanciones="NUESTRAS SANCIONES" />
+          <PanelEquipo
+            hoja={hoja}
+            tituloSanciones="NUESTRAS SANCIONES"
+            opcionesAtaque={opciones.opcionesPorContexto.ATQ}
+            opcionesDefensa={opciones.opcionesPorContexto.DEF}
+          />
         )}
 
         {hoja.partidos.length > 0 && (

@@ -1,0 +1,66 @@
+@import "./comun.css";
+
+.configuracion { max-width: 760px; min-height: 100dvh; margin: 0 auto; padding: 16px 16px 48px; box-sizing: border-box; }
+
+.configuracion__cabecera { display: flex; align-items: center; gap: 16px; margin: 4px 0 20px; }
+.configuracion__titulo {
+  flex: 1;
+  text-align: center;
+  color: var(--color-texto);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  padding-right: 40px; /* compensa el botón volver para centrar el título de verdad */
+}
+
+.configuracion__ayuda { margin: 0 0 20px; color: var(--color-texto-suave); }
+
+.configuracion__columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 640px) {
+  .configuracion__columnas { grid-template-columns: 1fr; }
+}
+
+.configuracion__columna h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 10px;
+  color: var(--color-texto);
+  font-size: 1.1rem;
+}
+
+.configuracion__contador { color: var(--color-texto-suave); font-size: 0.85rem; font-weight: 400; }
+
+.configuracion__lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+.configuracion__opcion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-gris-claro);
+  color: var(--color-texto-suave);
+  cursor: pointer;
+}
+
+.configuracion__opcion.is-activa { background: var(--color-rojo-claro); color: var(--color-texto); font-weight: 600; }
+.configuracion__opcion:has(input:disabled) { opacity: 0.5; cursor: not-allowed; }
+
+.configuracion__vacia { color: var(--color-texto-suave); padding: 10px 0; }
+
+.configuracion__ok { color: var(--color-verde); font-weight: 600; }
+
+.configuracion__acciones { display: flex; justify-content: flex-end; margin-top: 24px; }
+.configuracion__acciones .btn-primario {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-rojo);
+  color: #fff;
+  font-family: var(--fuente);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.configuracion__acciones .btn-primario:disabled { opacity: 0.6; cursor: not-allowed; }

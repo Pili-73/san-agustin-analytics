@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useHojaEstadisticas } from "../estado/useHojaEstadisticas";
+import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { useCargaAsync } from "../estado/useCargaAsync";
 import { obtenerPartido } from "../datos/partidos";
 import { obtenerEquipo } from "../datos/equipos";
@@ -14,7 +15,7 @@ import "../estilos/Estadisticas.css";
 async function cargarCabecera(partidoId) {
   const partido = await obtenerPartido(partidoId);
   const equipo = await obtenerEquipo(partido.id_equipo);
-  return { equipoNombre: equipo.nombre, rival: partido.rival };
+  return { equipoNombre: equipo.nombre, rival: partido.rival, idEquipo: equipo.id };
 }
 
 export default function Estadisticas() {
@@ -28,6 +29,7 @@ export default function Estadisticas() {
   const [cabecera, setCabecera] = useState({
     equipoNombre: location.state?.equipo || null,
     rival: location.state?.rival || null,
+    idEquipo: null,
   });
 
   // Solo actualiza el título; si falla, se queda con el valor de location.state.
@@ -39,6 +41,7 @@ export default function Estadisticas() {
 
   const [rango, setRango] = useState(null);
   const hoja = useHojaEstadisticas(partidoId, null, rango);
+  const opciones = useOpcionesAccion(cabecera.idEquipo);
 
   return (
     <div className="estadisticas">
@@ -51,8 +54,17 @@ export default function Estadisticas() {
 
       <AvisoSinConexion />
 
-      <EstadoCarga cargando={hoja.cargando} error={hoja.error} mensajeCargando="Cargando estadísticas…">
-        <PanelEquipo hoja={hoja} tituloSanciones="NUESTRAS SANCIONES" />
+      <EstadoCarga
+        cargando={hoja.cargando || opciones.cargando}
+        error={hoja.error || opciones.error}
+        mensajeCargando="Cargando estadísticas…"
+      >
+        <PanelEquipo
+          hoja={hoja}
+          tituloSanciones="NUESTRAS SANCIONES"
+          opcionesAtaque={opciones.opcionesPorContexto.ATQ}
+          opcionesDefensa={opciones.opcionesPorContexto.DEF}
+        />
         <FiltroTiempo rango={rango} onChange={setRango} maxMinutos={hoja.maxMinutos} />
       </EstadoCarga>
     </div>

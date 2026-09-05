@@ -228,6 +228,11 @@ export function calcularHojaCompleta(acciones) {
   const acciones7m = acciones.filter((accion) => accion.sit_ofensiva === "7M");
 
   return {
+    // En bruto (sin agregar), para que "Ver todas las acciones" pueda contar
+    // por su cuenta cualquier dato del catálogo configurado por el equipo,
+    // incluidos los que no tienen un contador con nombre propio más abajo.
+    accionesAtaque: acciones.filter((accion) => accion.at_def_san === "ATQ"),
+    accionesDefensa: acciones.filter((accion) => accion.at_def_san === "DEF"),
     estadisticasAtaque: calcularEstadisticas(acciones, "ATQ", null),
     estadisticasDefensa: calcularEstadisticas(acciones, "DEF", null),
     sanciones: calcularSanciones(acciones),

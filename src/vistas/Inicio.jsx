@@ -85,6 +85,7 @@ export default function Inicio() {
                   <Link to={`/equipos/${equipo.id}/partido/reanudar`}>Reanudar partido</Link>
                   <Link to={`/equipos/${equipo.id}/partidos`}>Ver partidos</Link>
                   <Link to={`/equipos/${equipo.id}/estadisticas`}>Estadísticas de temporada</Link>
+                  <Link to={`/equipos/${equipo.id}/configuracion`}>Configuración</Link>
                 </div>
               </article>
             ))}

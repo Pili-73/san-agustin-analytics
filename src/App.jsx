@@ -9,6 +9,7 @@ import EstadisticasJugador from "./vistas/EstadisticasJugador.jsx";
 import EstadisticasTemporada from "./vistas/EstadisticasTemporada.jsx";
 import Directo from "./vistas/Directo.jsx";
 import Jugadores from "./vistas/Jugadores.jsx";
+import Configuracion from "./vistas/Configuracion.jsx";
 import { useFlushColaGlobal } from "./estado/useFlushColaGlobal.js";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/equipos/:equipoId/jugadores" element={<Jugadores />} />
+        <Route path="/equipos/:equipoId/configuracion" element={<Configuracion />} />
         <Route path="/equipos/:equipoId/partido/nuevo" element={<Preparar />} />
         <Route path="/equipos/:equipoId/partido/reanudar" element={<ReanudarPartido />} />
         <Route path="/equipos/:equipoId/partidos" element={<PartidosGuardados />} />
