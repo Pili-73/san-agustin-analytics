@@ -41,9 +41,9 @@ export default function BarraDesglose({ fila, variant, abierto, onToggle, eficac
           {!es7m && (
             <BarraSegmentada
               segmentos={[
-                { etiqueta: "lanzamientos", valor: fila.lanzamientos, pct: fila.pctLanzamientos, tono: "verde" },
-                { etiqueta: "pérdidas", valor: fila.cambiosPosesion, pct: fila.pctCambiosPosesion, tono: "malo" },
-                { etiqueta: "continuidades", valor: fila.continuidades, pct: fila.pctContinuidades, tono: "gris" },
+                { etiqueta: "lanzam", valor: fila.lanzamientos, pct: fila.pctLanzamientos, tono: "verde" },
+                { etiqueta: "perd", valor: fila.cambiosPosesion, pct: fila.pctCambiosPosesion, tono: "malo" },
+                { etiqueta: "cont", valor: fila.continuidades, pct: fila.pctContinuidades, tono: "gris" },
               ]}
             />
           )}

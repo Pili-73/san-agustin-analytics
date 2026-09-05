@@ -26,9 +26,9 @@ export default function PanelContexto({
       <ResumenCifras resumen={resumen} />
       <BarraSegmentada
         segmentos={[
-          { etiqueta: "lanzamientos", valor: resumen.lanzamientos, pct: resumen.pctLanzamientos, tono: "verde" },
-          { etiqueta: "pérdidas", valor: resumen.cambiosPosesion, pct: resumen.pctCambiosPosesion, tono: "malo" },
-          { etiqueta: "continuidades", valor: resumen.continuidades, pct: resumen.pctContinuidades, tono: "gris" },
+          { etiqueta: "lanzam", valor: resumen.lanzamientos, pct: resumen.pctLanzamientos, tono: "verde" },
+          { etiqueta: "perd", valor: resumen.cambiosPosesion, pct: resumen.pctCambiosPosesion, tono: "malo" },
+          { etiqueta: "cont", valor: resumen.continuidades, pct: resumen.pctContinuidades, tono: "gris" },
         ]}
       />
       <GrupoBarras

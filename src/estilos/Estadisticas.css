@@ -267,8 +267,12 @@
 
 .barra-segmentada__leyenda {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
+  flex-wrap: nowrap;
+  gap: 4px 8px;
+}
+
+.barra-segmentada__etiqueta {
+  white-space: nowrap;
 }
 
 .barra-segmentada__etiqueta strong {
