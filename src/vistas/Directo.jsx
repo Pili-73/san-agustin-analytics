@@ -305,15 +305,16 @@ export default function Directo() {
   };
 
   // Guarda el estado final y sustituye (no añade) la entrada actual del
-  // historial por el listado de partidos: así, se llegue por el botón "Fin
-  // partido" o por el aviso al pulsar atrás, no queda ninguna entrada de
-  // Directo enterrada debajo sobre la que el botón atrás pueda volver a
+  // historial por el inicio de la app: así, se llegue por el botón "Fin
+  // partido" o por el aviso al pulsar atrás -en un partido normal o
+  // reanudado-, no queda ninguna entrada de Directo ni del listado de
+  // partidos enterrada debajo sobre la que el botón atrás pueda volver a
   // caer -esa es la causa del bucle Directo↔listado que reportaste-.
   const finalizarYNavegar = () => {
     partidoEnDirecto.pausarCronometro();
     partidoEnDirecto.guardarMarcadorFin("FINP");
     borrarEstadoDirecto(partidoId);
-    navigate(`/equipos/${partido?.id_equipo}/partidos`, { replace: true });
+    navigate("/", { replace: true });
   };
 
   // El botón no puede sustituir directamente la entrada actual: mientras no
