@@ -312,6 +312,13 @@ export default function Directo() {
   // caer -esa es la causa del bucle Directo↔listado que reportaste-.
   const finalizarYNavegar = () => {
     partidoEnDirecto.pausarCronometro();
+    // Quien siga en el campo al acabar el partido no tiene salida propia:
+    // sin este cierre explícito, sus minutos dependían de que el cálculo de
+    // estadísticas adivinara el corte a partir del marcador de fin, y
+    // cualquier fallo ahí (o un fin de partido accidental previo) los dejaba
+    // sin contar hasta el final real. Se cierra cada uno con su propio
+    // "OUT" al tiempo actual, igual que si hubiera salido al banquillo.
+    campoIds.forEach((idJugador) => partidoEnDirecto.guardarCambioJugador(idJugador, "OUT"));
     partidoEnDirecto.guardarMarcadorFin("FINP");
     borrarEstadoDirecto(partidoId);
     navigate("/", { replace: true });

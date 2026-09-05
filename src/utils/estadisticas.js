@@ -263,11 +263,22 @@ export function calcularMinutosJugador(acciones, jugadorId) {
     .filter((cambio) => cambio.minutos != null)
     .sort((a, b) => a.minutos - b.minutos);
 
-  const finPartido = acciones.find((accion) => accion.at_def_san === "SUS" && accion.fin === "FINP");
-  const finPrimeraParte = acciones.find((accion) => accion.at_def_san === "SUS" && accion.fin === "FIN1");
-  const techo = finPartido
-    ? minutosDeTiempo(finPartido.tiempo)
-    : finPrimeraParte
+  // El más tardío, no el primero que aparezca: si el partido se finalizó por
+  // error y se reanudó (dos marcadores del mismo tipo), el bueno es el
+  // último en el tiempo, no el que Supabase devuelva primero.
+  const marcadorMasTardio = (fin) =>
+    acciones
+      .filter((accion) => accion.at_def_san === "SUS" && accion.fin === fin)
+      .reduce((actual, accion) => {
+        const minutos = minutosDeTiempo(accion.tiempo);
+        return minutos != null && (!actual || minutos > actual) ? minutos : actual;
+      }, null);
+
+  const finPartido = marcadorMasTardio("FINP");
+  const finPrimeraParte = marcadorMasTardio("FIN1");
+  const techo = finPartido != null
+    ? finPartido
+    : finPrimeraParte != null
     ? 30
     : calcularMaxMinutos(acciones);
 
