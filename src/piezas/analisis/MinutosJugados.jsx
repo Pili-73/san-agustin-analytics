@@ -18,9 +18,15 @@ export default function MinutosJugados({ minutosJugados }) {
           intervalos.length > 0 ? (
             <div className="minutos-jugados__intervalos-scroll">
               <div className="minutos-jugados__intervalos">
-                {intervalos.map(([inicio, fin], indice) => (
-                  <span className="minutos-jugados__intervalo" key={indice}>{Math.floor(inicio)}-{Math.floor(fin)}</span>
-                ))}
+                {intervalos.map(([inicio, fin], indice) => {
+                  const desde = Math.floor(inicio);
+                  // Si de verdad estuvo en pista (fin > inicio) pero los dos
+                  // caen en el mismo minuto redondeado (p.ej. entra y sale en
+                  // los mismos segundos), forzar al menos un minuto de ancho:
+                  // "36-36" parece que no jugó nada, aunque sí contase tiempo.
+                  const hasta = fin > inicio ? Math.max(Math.floor(fin), desde + 1) : desde;
+                  return <span className="minutos-jugados__intervalo" key={indice}>{desde}-{hasta}</span>;
+                })}
               </div>
             </div>
           ) : (

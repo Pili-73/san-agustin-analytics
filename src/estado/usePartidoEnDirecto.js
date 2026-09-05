@@ -189,7 +189,7 @@ export function usePartidoEnDirecto(partidoId) {
     }
   };
 
-  const guardarCambioJugador = (idJugador, tipo) => guardarSuceso({ id_jugador: idJugador, fin: tipo });
+  const guardarCambioJugador = (idJugador, tipo, tiempo) => guardarSuceso({ id_jugador: idJugador, fin: tipo }, tiempo);
   const guardarMarcadorFin = (tipo, tiempo) => guardarSuceso({ fin: tipo }, tiempo);
 
   // Deshace solo la última acción (no hay historial de varios pasos): borra

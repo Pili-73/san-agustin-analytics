@@ -304,23 +304,63 @@ export default function Directo() {
     return `¿Estás seguro de acabar el partido?${avisoPendientes}`;
   };
 
+  // Aviso al pulsar atrás: distinto del de "Fin partido" -salir por atrás no
+  // acaba el partido, solo lo deja tal cual para reanudarlo luego-.
+  const mensajeConfirmarSalir = () => {
+    const avisoPendientes = totalPendientes
+      ? `\n\nOjo: quedan ${totalPendientes} cambios sin subir (sin conexión). Se guardarán solos en cuanto vuelva la red; hasta entonces solo se ven en Estadísticas desde este mismo dispositivo.`
+      : "";
+    return `¿Salir sin finalizar el partido? Podrás reanudarlo más tarde tal como está.${avisoPendientes}`;
+  };
+
   // Guarda el estado final y sustituye (no añade) la entrada actual del
   // historial por el inicio de la app: así, se llegue por el botón "Fin
-  // partido" o por el aviso al pulsar atrás -en un partido normal o
-  // reanudado-, no queda ninguna entrada de Directo ni del listado de
-  // partidos enterrada debajo sobre la que el botón atrás pueda volver a
-  // caer -esa es la causa del bucle Directo↔listado que reportaste-.
+  // partido" -en un partido normal o reanudado-, no queda ninguna entrada de
+  // Directo ni del listado de partidos enterrada debajo sobre la que el
+  // botón atrás pueda volver a caer -esa es la causa del bucle
+  // Directo↔listado que reportaste-. Solo se llama desde el botón "Fin
+  // partido" (directo, o su autorización de un solo popstate vía
+  // finalizacionAutorizadaRef); pulsar atrás sin pasar por ese botón usa
+  // salirYNavegar en su lugar, que no marca el partido como finalizado.
   const finalizarYNavegar = () => {
     partidoEnDirecto.pausarCronometro();
+    // Igual que "Fin primer tiempo" fija el reloj a 30:00 aunque llevara
+    // otro tiempo marcado, aquí se fija a 60:00: el cronómetro del
+    // entrenador puede llevar un pequeño desajuste (pausas, tiempos
+    // muertos...), pero al pulsar "Fin partido" el partido se da por
+    // acabado en el minuto 60 oficial, no en lo que marcase el reloj.
+    partidoEnDirecto.establecerTiempoManual(60, 0);
     // Quien siga en el campo al acabar el partido no tiene salida propia:
     // sin este cierre explícito, sus minutos dependían de que el cálculo de
     // estadísticas adivinara el corte a partir del marcador de fin, y
     // cualquier fallo ahí (o un fin de partido accidental previo) los dejaba
     // sin contar hasta el final real. Se cierra cada uno con su propio
-    // "OUT" al tiempo actual, igual que si hubiera salido al banquillo.
-    campoIds.forEach((idJugador) => partidoEnDirecto.guardarCambioJugador(idJugador, "OUT"));
-    partidoEnDirecto.guardarMarcadorFin("FINP");
+    // "OUT" a los 60:00, igual que si hubiera salido al banquillo. "60:00"
+    // va explícito (no basta con el establecerTiempoManual de arriba) porque
+    // el estado del reloj todavía no se habrá actualizado a tiempo para esta
+    // misma función síncrona.
+    campoIds.forEach((idJugador) => partidoEnDirecto.guardarCambioJugador(idJugador, "OUT", "60:00"));
+    partidoEnDirecto.guardarMarcadorFin("FINP", "60:00");
     borrarEstadoDirecto(partidoId);
+    navigate("/", { replace: true });
+  };
+
+  // Salir por el botón atrás sin pasar por "Fin partido": no escribe FINP ni
+  // cierra a nadie con un "OUT" -el partido no se da por acabado-, solo
+  // guarda el mismo snapshot resumible que usa "ver Estadísticas" para que
+  // "Reanudar partido" lo recupere tal cual se dejó.
+  const salirYNavegar = () => {
+    partidoEnDirecto.pausarCronometro();
+    guardarEstadoDirecto(partidoId, {
+      elapsedMs: partidoEnDirecto.elapsedMs,
+      golesAgustinos: partidoEnDirecto.marcador.golesAgustinos,
+      golesRival: partidoEnDirecto.marcador.golesRival,
+      tipoDefPropio,
+      tipoDefRival,
+      campoIds,
+      banquilloIds,
+      parte,
+    });
     navigate("/", { replace: true });
   };
 
@@ -340,17 +380,20 @@ export default function Directo() {
   // vez, siempre use la versión más reciente de estas funciones (con el
   // partido/pendientes actuales) en vez de quedarse con la del primer render.
   const finalizarYNavegarRef = useRef(finalizarYNavegar);
-  const mensajeConfirmarFinRef = useRef(mensajeConfirmarFin);
+  const salirYNavegarRef = useRef(salirYNavegar);
+  const mensajeConfirmarSalirRef = useRef(mensajeConfirmarSalir);
   const finalizacionAutorizadaRef = useRef(false);
   useEffect(() => {
     finalizarYNavegarRef.current = finalizarYNavegar;
-    mensajeConfirmarFinRef.current = mensajeConfirmarFin;
+    salirYNavegarRef.current = salirYNavegar;
+    mensajeConfirmarSalirRef.current = mensajeConfirmarSalir;
   });
 
-  // Botón atrás del móvil/tablet/navegador: mismo aviso que "Fin partido".
-  // Se añade una entrada extra al historial al entrar; al pulsar atrás se
-  // consume esa entrada (sin salir de verdad) y se muestra el aviso. Si el
-  // usuario cancela, se repone la entrada para poder atraparlo otra vez.
+  // Botón atrás del móvil/tablet/navegador: sale sin finalizar el partido
+  // (aviso propio, distinto del de "Fin partido"). Se añade una entrada
+  // extra al historial al entrar; al pulsar atrás se consume esa entrada
+  // (sin salir de verdad) y se muestra el aviso. Si el usuario cancela, se
+  // repone la entrada para poder atraparlo otra vez.
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
     const onPopState = async () => {
@@ -359,8 +402,8 @@ export default function Directo() {
         finalizarYNavegarRef.current();
         return;
       }
-      if (await confirmar(mensajeConfirmarFinRef.current())) {
-        finalizarYNavegarRef.current();
+      if (await confirmar(mensajeConfirmarSalirRef.current())) {
+        salirYNavegarRef.current();
       } else {
         window.history.pushState(null, "", window.location.href);
       }
