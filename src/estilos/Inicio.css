@@ -71,6 +71,18 @@
   cursor: pointer;
 }
 
+.btn-tutorial {
+  display: block;
+  margin: 14px auto 0;
+  padding: 10px 18px;
+  border: 1px solid var(--color-rojo-claro);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--color-rojo-oscuro);
+  font: 700 0.95rem var(--fuente);
+  cursor: pointer;
+}
+
 .inicio h1 {
   margin: 32px 10px 0;
   color: var(--color-rojo);

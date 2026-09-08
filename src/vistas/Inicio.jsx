@@ -4,6 +4,7 @@ import { crearEquipo, listarEquipos } from "../datos/equipos";
 import { useCargaAsync } from "../estado/useCargaAsync";
 import { temporadaActual } from "../utils/temporada";
 import Modal from "../piezas/comun/Modal";
+import Tutorial from "../piezas/comun/Tutorial";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
 import "../estilos/Inicio.css";
 
@@ -15,6 +16,7 @@ export default function Inicio() {
   const [guardando, setGuardando] = useState(false);
   const [errorGuardado, setErrorGuardado] = useState("");
   const [temporadaSeleccionada, setTemporadaSeleccionada] = useState(temporadaActual);
+  const [mostrarTutorial, setMostrarTutorial] = useState(false);
 
   const { cargando, error } = useCargaAsync(listarEquipos, {
     onExito: setEquipos,
@@ -109,6 +111,12 @@ export default function Inicio() {
           {temporadasDisponibles.map((valor) => <option key={valor} value={valor}>{valor}</option>)}
         </select>
       </div>
+
+      <button type="button" className="btn-tutorial" onClick={() => setMostrarTutorial(true)}>
+        📘 Tutorial
+      </button>
+
+      {mostrarTutorial && <Tutorial onClose={() => setMostrarTutorial(false)} />}
 
       {mostrarAlta && (
         <Modal title="Añadir equipo" onClose={cerrarAlta}>
