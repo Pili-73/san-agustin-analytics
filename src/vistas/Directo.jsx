@@ -171,13 +171,14 @@ export default function Directo() {
 
   const jugadorSeleccionado = jugadores.find((jugador) => jugador.id === seleccionado);
   const esPorteroSeleccionado = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
-  const puedeGuardarLanzamiento = !!jugadorSeleccionado && !!zonaLanz && !!zonaPorteria && !partidoEnDirecto.guardando;
+  const puedeGuardarLanzamiento = !partidoEnDirecto.guardando;
   const totalPendientes = partidoEnDirecto.pendientes.length + partidoEnDirecto.pendientesBorrado;
 
-  // Cambiar de jugador cierra cualquier desplegable de ataque/defensa/sanción
-  // que hubiera quedado abierto: sus opciones son para el jugador anterior.
+  // Cambiar de jugador (o deseleccionarlo, pulsando el que ya estaba
+  // marcado) cierra cualquier desplegable de ataque/defensa/sanción que
+  // hubiera quedado abierto: sus opciones eran para el jugador anterior.
   const seleccionarJugador = (id) => {
-    setSeleccionado(id);
+    setSeleccionado((actual) => (actual === id ? null : id));
     setGrupoAbierto(null);
   };
 
@@ -196,12 +197,8 @@ export default function Directo() {
   };
 
   const guardarEvento = async (codigo, fin) => {
-    if (!jugadorSeleccionado) {
-      partidoEnDirecto.limpiarAviso();
-      return;
-    }
     const guardada = await partidoEnDirecto.guardarAccion({
-      id_jugador: jugadorSeleccionado.id,
+      id_jugador: jugadorSeleccionado ? jugadorSeleccionado.id : null,
       at_def_san: codigo,
       fin,
       sit_ofensiva: situacion,
@@ -209,17 +206,17 @@ export default function Directo() {
     });
     if (guardada) {
       setSituacion("POS");
+      setSeleccionado(null);
       if (fin === "2MIN") partidoEnDirecto.pausarCronometro();
     }
     setGrupoAbierto(null);
   };
 
   const guardarLanzamiento = async (resultado) => {
-    if (!jugadorSeleccionado || !zonaLanz || !zonaPorteria) return;
-    const esPortero = jugadorSeleccionado.posicion?.toLowerCase() === "portero";
+    const esPortero = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
     const tipoAccion = esPortero ? "DEF" : "ATQ";
     const guardada = await partidoEnDirecto.guardarAccion({
-      id_jugador: jugadorSeleccionado.id,
+      id_jugador: jugadorSeleccionado ? jugadorSeleccionado.id : null,
       at_def_san: tipoAccion,
       sit_ofensiva: situacion,
       tipo_def: tipoDefPara(tipoAccion),
@@ -231,6 +228,7 @@ export default function Directo() {
       setZonaLanz(null);
       setZonaPorteria(null);
       setSituacion("POS");
+      setSeleccionado(null);
     }
   };
 
@@ -502,7 +500,7 @@ export default function Directo() {
 
           <section className="acciones-jugador" aria-label="Acciones del jugador seleccionado">
             <div className="acciones-jugador__cabecera">
-              <p>{jugadorSeleccionado ? `Jugador: ${jugadorSeleccionado.nombre} ${jugadorSeleccionado.apellido}` : "Selecciona un jugador para anotar acciones"}</p>
+              <p>{jugadorSeleccionado ? `Jugador: ${jugadorSeleccionado.nombre} ${jugadorSeleccionado.apellido}` : "Sin jugador seleccionado (se anotará en la hoja general)"}</p>
               <div className="acciones-jugador__estado">
                 {totalPendientes > 0 && (
                   <span className="badge-pendientes" title="Cambios guardados localmente, a la espera de conexión">
@@ -524,7 +522,7 @@ export default function Directo() {
             <div className="acciones-jugador__grupos">
               {gruposAccion.map((grupo) => (
                 <div className={`grupo-accion grupo-accion--${grupo.codigo.toLowerCase()}`} key={grupo.codigo}>
-                  <button type="button" className="grupo-accion__cabecera" onClick={() => setGrupoAbierto((actual) => actual === grupo.codigo ? null : grupo.codigo)} disabled={!jugadorSeleccionado}>
+                  <button type="button" className="grupo-accion__cabecera" onClick={() => setGrupoAbierto((actual) => actual === grupo.codigo ? null : grupo.codigo)}>
                     {grupo.titulo}
                     <span className="grupo-accion__flecha" aria-hidden="true">{grupoAbierto === grupo.codigo ? "▲" : "▼"}</span>
                   </button>
