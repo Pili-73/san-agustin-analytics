@@ -249,6 +249,12 @@ export default function Jugadores() {
                   value={form.posicion}
                   onChange={(event) => setForm((actual) => ({ ...actual, posicion: event.target.value }))}
                 >
+                  {/* Jugadores antiguos pueden tener una posición que ya no está en
+                      la lista (p.ej. en minúsculas): se añade como opción extra para
+                      no perderla silenciosamente al guardar sin tocar este campo. */}
+                  {form.posicion && !POSICIONES.includes(form.posicion) && (
+                    <option value={form.posicion}>{form.posicion}</option>
+                  )}
                   {POSICIONES.map((posicion) => (
                     <option key={posicion} value={posicion}>
                       {posicion}

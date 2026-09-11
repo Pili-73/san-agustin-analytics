@@ -37,6 +37,12 @@ export default function Inicio() {
     ? equipos.filter((equipo) => equipo.temporada === temporadaSeleccionada)
     : equipos;
 
+  const abrirAlta = () => {
+    setNombre("");
+    setTemporada(temporadaActual());
+    setMostrarAlta(true);
+  };
+
   const cerrarAlta = () => {
     if (guardando) return;
     setMostrarAlta(false);
@@ -92,7 +98,7 @@ export default function Inicio() {
               </article>
             ))}
 
-            <button className="tarjeta-equipo tarjeta-equipo--alta" type="button" onClick={() => setMostrarAlta(true)}>
+            <button className="tarjeta-equipo tarjeta-equipo--alta" type="button" onClick={abrirAlta}>
               <span aria-hidden="true">+</span>
               Añadir equipo
             </button>
