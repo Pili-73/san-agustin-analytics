@@ -183,7 +183,10 @@ function zonasVacias() {
 // Goles/lanzamientos por cada una de las 9 zonas de lanzamiento y de las 9
 // zonas de portería, para el mapa de eficacia visual. En ataque son los
 // lanzamientos propios; en defensa, los recibidos por el portero (eficacia
-// de portería en defensa).
+// de portería en defensa). `pares` recoge, por cada combinación de
+// zona_lanz/zona_porteria que aparece entre los lanzamientos, cuántas veces
+// se repite, para poder dibujar en el mapa la línea que une ambas zonas con
+// un grosor proporcional a esa frecuencia.
 export function calcularEficaciaPorZonas(todasLasAcciones, contexto) {
   const lanzamientos = todasLasAcciones.filter(
     (accion) => accion.at_def_san === contexto && Boolean(accion.gol_parada_fuera)
@@ -191,6 +194,7 @@ export function calcularEficaciaPorZonas(todasLasAcciones, contexto) {
 
   const porZonaLanz = zonasVacias();
   const porZonaPorteria = zonasVacias();
+  const cuentaPares = new Map();
 
   for (const accion of lanzamientos) {
     const esGol = accion.gol_parada_fuera === "GOL";
@@ -202,9 +206,18 @@ export function calcularEficaciaPorZonas(todasLasAcciones, contexto) {
       porZonaPorteria[accion.zona_porteria].lanzamientos += 1;
       if (esGol) porZonaPorteria[accion.zona_porteria].goles += 1;
     }
+    if (accion.zona_lanz && accion.zona_porteria) {
+      const clave = `${accion.zona_lanz}-${accion.zona_porteria}`;
+      cuentaPares.set(clave, (cuentaPares.get(clave) || 0) + 1);
+    }
   }
 
-  return { porZonaLanz, porZonaPorteria };
+  const pares = Array.from(cuentaPares, ([clave, cuenta]) => {
+    const [zonaLanz, zonaPorteria] = clave.split("-").map(Number);
+    return { zonaLanz, zonaPorteria, cuenta };
+  });
+
+  return { porZonaLanz, porZonaPorteria, pares };
 }
 
 // Recuento de sanciones de todo el partido (no se dividen en ataque/defensa).

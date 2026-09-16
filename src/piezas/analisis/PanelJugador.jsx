@@ -51,6 +51,7 @@ export default function PanelJugador({ stats, esPortero, tituloSanciones, opcion
             <MapaEficacia
               porZonaPorteria={eficaciaZonas.porZonaPorteria}
               porZonaLanz={eficaciaZonas.porZonaLanz}
+              pares={eficaciaZonas.pares}
               variant={variant}
             />
           </div>
@@ -59,6 +60,7 @@ export default function PanelJugador({ stats, esPortero, tituloSanciones, opcion
             <MapaEficacia
               porZonaPorteria={eficaciaZonas7m.porZonaPorteria}
               porZonaLanz={eficaciaZonas7m.porZonaLanz}
+              pares={eficaciaZonas7m.pares}
               variant={variant}
             />
           </div>

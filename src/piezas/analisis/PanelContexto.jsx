@@ -43,6 +43,7 @@ export default function PanelContexto({
         titulo="Eficacia por zona"
         porZonaPorteria={eficaciaZonas.porZonaPorteria}
         porZonaLanz={eficaciaZonas.porZonaLanz}
+        pares={eficaciaZonas.pares}
         variant={variant}
       />
     </section>

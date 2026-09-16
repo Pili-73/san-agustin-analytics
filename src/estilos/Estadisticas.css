@@ -644,6 +644,19 @@
   object-fit: cover;
 }
 
+.mapa-eficacia__lineas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mapa-eficacia__lineas line {
+  stroke: var(--color-texto);
+  stroke-opacity: 0.45;
+  stroke-linecap: round;
+}
+
 .mapa-eficacia__cuadrantes {
   position: absolute;
   top: 15.7%;

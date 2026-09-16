@@ -21,3 +21,19 @@ export function centroideZona(puntos) {
   const y = vertices.reduce((suma, [, vy]) => suma + vy, 0) / vertices.length;
   return { x, y };
 }
+
+// Rejilla de las 9 zonas de portería (mapa-eficacia__cuadrantes y
+// selector-cuadrantes--porteria), expresada en el mismo sistema de
+// coordenadas 0-100 que ZONAS_LANZAMIENTO, para poder trazar la línea
+// zona_lanz-zona_porteria de cada acción sobre el mismo SVG. Si cambia la
+// posición de la rejilla en el CSS, hay que actualizar estos valores también.
+const REJILLA_PORTERIA = { left: 15, top: 15.7, ancho: 70, alto: 37 };
+
+export function centroideZonaPorteria(zona) {
+  const indice = zona - 1;
+  const fila = Math.floor(indice / 3);
+  const columna = indice % 3;
+  const x = REJILLA_PORTERIA.left + (REJILLA_PORTERIA.ancho / 3) * (columna + 0.5);
+  const y = REJILLA_PORTERIA.top + (REJILLA_PORTERIA.alto / 3) * (fila + 0.5);
+  return { x, y };
+}

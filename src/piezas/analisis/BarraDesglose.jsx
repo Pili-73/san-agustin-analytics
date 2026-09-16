@@ -59,6 +59,7 @@ export default function BarraDesglose({ fila, variant, abierto, onToggle, eficac
               titulo="Eficacia de 7 m"
               porZonaPorteria={eficaciaZonas7m.porZonaPorteria}
               porZonaLanz={eficaciaZonas7m.porZonaLanz}
+              pares={eficaciaZonas7m.pares}
               variant={variant}
             />
           )}
