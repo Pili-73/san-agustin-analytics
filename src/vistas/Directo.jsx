@@ -5,7 +5,6 @@ import { listarJugadoresEquipo } from "../datos/jugadores";
 import { obtenerPartido } from "../datos/partidos";
 import { listarAccionesPartido } from "../datos/acciones";
 import { usePartidoEnDirecto } from "../estado/usePartidoEnDirecto";
-import { useArrastrePlantilla } from "../estado/useArrastrePlantilla";
 import { useConfirmacion } from "../estado/useConfirmacion";
 import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { formatearTiempo, minutosDeTiempo, msDeTiempo } from "../utils/tiempo";
@@ -108,7 +107,7 @@ export default function Directo() {
         setParte(guardado.parte || 1);
       } else {
         // Al iniciar o reanudar un partido, todos los jugadores empiezan en
-        // el banquillo: el entrenador arrastra a los que salen de inicio.
+        // el banquillo: el entrenador sube con la flecha a los que salen de inicio.
         setCampoIds([]);
         setBanquilloIds(jugadoresCargados.map((jugador) => jugador.id));
 
@@ -182,13 +181,20 @@ export default function Directo() {
     setGrupoAbierto(null);
   };
 
-  const { arrastre, zonaSobrevolada, empezarArrastre, seguirArrastre, soltarArrastre } = useArrastrePlantilla({
-    campo: campoIds,
-    banquillo: banquilloIds,
-    setCampo: setCampoIds,
-    setBanquillo: setBanquilloIds,
-    onCambioLista: (idJugador, tipo) => partidoEnDirecto.guardarCambioJugador(idJugador, tipo),
-  });
+  // Un clic en la flecha pasa al jugador a la otra lista (se coloca al
+  // final) y registra la entrada ("IN") o salida ("OUT") para los minutos
+  // jugados. Sustituye al arrastre: con un clic no hay cambios accidentales.
+  const moverJugador = (idJugador, origen) => {
+    if (origen === "banquillo") {
+      setBanquilloIds((ids) => ids.filter((id) => id !== idJugador));
+      setCampoIds((ids) => [...ids, idJugador]);
+      partidoEnDirecto.guardarCambioJugador(idJugador, "IN");
+    } else {
+      setCampoIds((ids) => ids.filter((id) => id !== idJugador));
+      setBanquilloIds((ids) => [...ids, idJugador]);
+      partidoEnDirecto.guardarCambioJugador(idJugador, "OUT");
+    }
+  };
 
   const tipoDefPara = (codigo) => {
     if (codigo === "ATQ") return tipoDefRival;
@@ -433,11 +439,7 @@ export default function Directo() {
             jugadores={jugadoresCampo}
             seleccionado={seleccionado}
             onSeleccionar={seleccionarJugador}
-            onEmpezarArrastre={empezarArrastre}
-            onSeguirArrastre={seguirArrastre}
-            onSoltarArrastre={soltarArrastre}
-            arrastrandoId={arrastre?.id}
-            sobrevolada={zonaSobrevolada}
+            onMover={moverJugador}
           />
           <div className="plantilla-directo__separador">BANQUILLO</div>
           <ListaJugadores
@@ -446,11 +448,7 @@ export default function Directo() {
             jugadores={jugadoresBanquillo}
             seleccionado={seleccionado}
             onSeleccionar={seleccionarJugador}
-            onEmpezarArrastre={empezarArrastre}
-            onSeguirArrastre={seguirArrastre}
-            onSoltarArrastre={soltarArrastre}
-            arrastrandoId={arrastre?.id}
-            sobrevolada={zonaSobrevolada}
+            onMover={moverJugador}
           />
         </aside>
 
@@ -571,25 +569,19 @@ export default function Directo() {
   );
 }
 
-function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar, onEmpezarArrastre, onSeguirArrastre, onSoltarArrastre, arrastrandoId, sobrevolada }) {
-  const sobrevolandoFinal = sobrevolada?.lista === lista && sobrevolada?.targetId == null;
+function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar, onMover }) {
+  const enCampo = lista === "campo";
   return (
-    <section className="lista-directo" data-lista={lista}>
+    <section className="lista-directo">
       {titulo && <h3>{titulo}</h3>}
       {jugadores.map((jugador) => {
-        const marcaAntes = sobrevolada?.lista === lista && sobrevolada?.targetId === jugador.id && sobrevolada?.before;
-        const marcaDespues = sobrevolada?.lista === lista && sobrevolada?.targetId === jugador.id && !sobrevolada?.before;
         return (
           <div
             key={jugador.id}
-            data-jugador-fila={jugador.id}
             className={[
               "jugador-directo",
               jugador.posicion?.toLowerCase() === "portero" ? "jugador-directo--portero" : "",
               seleccionado === jugador.id ? "is-selected" : "",
-              arrastrandoId === jugador.id ? "is-arrastrando" : "",
-              marcaAntes ? "drop-antes" : "",
-              marcaDespues ? "drop-despues" : "",
             ].filter(Boolean).join(" ")}
           >
             <button type="button" className="jugador-directo__nombre" onClick={() => onSeleccionar(jugador.id)}>
@@ -597,20 +589,19 @@ function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar,
             </button>
             <button
               type="button"
-              className="jugador-directo__asa"
-              aria-label="Arrastrar para mover de lista"
-              onPointerDown={(event) => onEmpezarArrastre(event, jugador.id, lista)}
-              onPointerMove={onSeguirArrastre}
-              onPointerUp={onSoltarArrastre}
-              onPointerCancel={onSoltarArrastre}
+              className="jugador-directo__mover"
+              aria-label={enCampo ? "Mandar al banquillo" : "Sacar al campo"}
+              title={enCampo ? "Mandar al banquillo" : "Sacar al campo"}
+              onClick={() => onMover(jugador.id, lista)}
             >
-              ⠿
+              {enCampo ? "↓" : "↑"}
             </button>
           </div>
         );
       })}
-      {jugadores.length === 0 && <p className="lista-directo__vacia">Suelta aquí un jugador.</p>}
-      <div className={`lista-directo__final ${sobrevolandoFinal ? "drop-al-final" : ""}`} />
+      {jugadores.length === 0 && (
+        <p className="lista-directo__vacia">{enCampo ? "Sube jugadores del banquillo con ↑." : "Sin jugadores en el banquillo."}</p>
+      )}
     </section>
   );
 }

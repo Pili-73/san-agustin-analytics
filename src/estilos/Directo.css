@@ -29,18 +29,14 @@
 .jugador-directo { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px; margin-bottom: 7px; border-radius: 8px; background: var(--color-rojo); color: #fff; overflow: hidden; transition: opacity 0.15s ease, outline-color 0.1s ease; }
 .jugador-directo--portero { background: var(--color-amarillo); color: #342806; }
 .jugador-directo.is-selected { outline: 3px solid #222; }
-.jugador-directo.is-arrastrando { opacity: .35; }
-.jugador-directo.drop-antes { box-shadow: inset 0 3px 0 0 #222; }
-.jugador-directo.drop-despues { box-shadow: inset 0 -3px 0 0 #222; }
 .jugador-directo__nombre { min-width: 0; padding: 9px 6px; border: 0; background: transparent; color: inherit; cursor: pointer; font-family: var(--fuente); font-size: .88rem; font-weight: 700; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .jugador-directo__nombre strong { display: inline-block; width: 22px; }
-.jugador-directo__asa { display: flex; align-items: center; justify-content: center; min-width: 30px; min-height: 30px; margin-right: 3px; border: 0; border-radius: 4px; background: rgb(255 255 255 / 22%); color: inherit; font-size: 1.1rem; line-height: 1; cursor: grab; touch-action: none; user-select: none; }
-.jugador-directo__asa:active { cursor: grabbing; background: rgb(255 255 255 / 40%); }
+.jugador-directo__mover { display: flex; align-items: center; justify-content: center; min-width: 30px; min-height: 30px; margin-right: 3px; border: 0; border-radius: 4px; background: rgb(255 255 255 / 22%); color: inherit; font-size: 1.1rem; font-weight: 800; line-height: 1; cursor: pointer; }
+.jugador-directo__mover:hover { background: rgb(255 255 255 / 35%); }
+.jugador-directo__mover:active { background: rgb(255 255 255 / 50%); }
 
 .plantilla-directo__separador { margin: 16px 0 10px; border-block: 2px solid #555; padding: 6px; color: #555; font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-align: center; }
 .lista-directo__vacia { margin: 8px 0; color: #777; font-size: .82rem; font-style: italic; }
-.lista-directo__final { min-height: 10px; }
-.lista-directo__final.drop-al-final { border-radius: 4px; background: repeating-linear-gradient(45deg, #999, #999 4px, transparent 4px, transparent 8px); }
 
 /* --- Panel principal --- */
 /* min-height: 0 es necesario para que, siendo un hijo de grid con altura
@@ -199,7 +195,7 @@
      estrecha, cortar con puntos suspensivos deja el nombre irreconocible. */
   .jugador-directo__nombre { font-size: .78rem; padding: 6px 4px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; }
   .jugador-directo__nombre strong { width: 15px; }
-  .jugador-directo__asa { min-width: 26px; min-height: 26px; }
+  .jugador-directo__mover { min-width: 26px; min-height: 26px; }
 }
 
 /* Móviles muy estrechos: un pelín más compacto todavía. */
