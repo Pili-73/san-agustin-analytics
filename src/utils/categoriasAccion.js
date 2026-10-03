@@ -51,3 +51,52 @@ export const FIN_POR_CLAVE = Object.fromEntries(
       : Object.keys(fila.fin).map((contexto) => [fila.clave[contexto], fila.fin[contexto]])
   )
 );
+
+// Resultado de un lanzamiento (accion.gol_parada_fuera) y sanciones
+// (accion.fin dentro de at_def_san "SAN"): códigos fijos, no configurables
+// por equipo, así que no salen del catálogo como el resto de acciones.
+const RESULTADO_LANZAMIENTO = {
+  GOL: { titulo: "Gol", color: "verde" },
+  PAR: { titulo: "Parada", color: "azul" },
+  FUE: { titulo: "Fuera", color: "malo" },
+};
+
+const TITULO_SANCION = {
+  "2MIN": "Exclusión",
+  AMARILLA: "Tarjeta amarilla",
+  ROJA: "Tarjeta roja",
+  AZUL: "Tarjeta azul",
+};
+
+// Título y color para mostrar una acción individual (p.ej. en la línea del
+// tiempo): un lanzamiento no tiene `fin` (lo describe gol_parada_fuera), una
+// sanción usa sus propios códigos fijos, y el resto sale del catálogo de
+// datos de ataque/defensa del equipo (catalogoPorContexto, de
+// useOpcionesAccion) para respetar los títulos que el equipo haya puesto.
+export function describirAccion(accion, catalogoPorContexto = {}) {
+  if (accion.gol_parada_fuera) {
+    const resultado = RESULTADO_LANZAMIENTO[accion.gol_parada_fuera] || {
+      titulo: accion.gol_parada_fuera,
+      color: "gris",
+    };
+    return { titulo: `Lanzamiento: ${resultado.titulo}`, color: resultado.color };
+  }
+  if (accion.at_def_san === "SAN") {
+    return { titulo: TITULO_SANCION[accion.fin] || accion.fin, color: "gris" };
+  }
+  const catalogo = catalogoPorContexto[accion.at_def_san] || [];
+  const opcion = catalogo.find((item) => item.fin === accion.fin);
+  return opcion ? { titulo: opcion.titulo, color: opcion.color } : { titulo: accion.fin || "Acción", color: "gris" };
+}
+
+// "favor" | "contra": en qué columna va una acción en la línea del tiempo,
+// para no tener que decirlo con texto. Un lanzamiento o cualquier otra
+// acción de ataque/defensa ya lo dice at_def_san (igual que en Directo.jsx
+// para el marcador: ATQ = nuestro, DEF = del rival). Una sanción no tiene
+// ATQ/DEF propio: id_jugador es siempre de nuestro plantel (no se registra
+// el del rival), así que null significa que la sanción es del rival -a
+// favor nuestro- y con id_jugador es a uno de los nuestros -en contra-.
+export function contextoAccion(accion) {
+  if (accion.at_def_san === "SAN") return accion.id_jugador ? "contra" : "favor";
+  return accion.at_def_san === "DEF" ? "contra" : "favor";
+}

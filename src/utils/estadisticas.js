@@ -240,12 +240,21 @@ export function calcularHojaCompleta(acciones) {
   // (antes se filtraba dos veces con el mismo predicado).
   const acciones7m = acciones.filter((accion) => accion.sit_ofensiva === "7M");
 
+  // Ataque + defensa + sanciones, ordenadas por minuto:segundo, para la
+  // línea del tiempo de la hoja de estadísticas (se dejan fuera los
+  // marcadores de sustitución/fin de parte: no son jugadas que revisar).
+  const accionesCronologicas = acciones
+    .filter((accion) => accion.at_def_san === "ATQ" || accion.at_def_san === "DEF" || accion.at_def_san === "SAN")
+    .slice()
+    .sort((a, b) => (minutosDeTiempo(a.tiempo) ?? Infinity) - (minutosDeTiempo(b.tiempo) ?? Infinity));
+
   return {
     // En bruto (sin agregar), para que "Ver todas las acciones" pueda contar
     // por su cuenta cualquier dato del catálogo configurado por el equipo,
     // incluidos los que no tienen un contador con nombre propio más abajo.
     accionesAtaque: acciones.filter((accion) => accion.at_def_san === "ATQ"),
     accionesDefensa: acciones.filter((accion) => accion.at_def_san === "DEF"),
+    accionesCronologicas,
     estadisticasAtaque: calcularEstadisticas(acciones, "ATQ", null),
     estadisticasDefensa: calcularEstadisticas(acciones, "DEF", null),
     sanciones: calcularSanciones(acciones),

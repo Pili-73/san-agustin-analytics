@@ -848,3 +848,117 @@
   width: 20px;
   background: var(--color-rojo);
 }
+
+/* --- Línea del tiempo (todas las acciones del partido, por mm:ss) --- */
+/* Tarjeta propia (como las demás) para distinguirla del filtro de tiempo que
+   tiene justo encima. Las burbujas llevan borde gris para no fundirse con el
+   fondo de la tarjeta. */
+.linea-tiempo {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--color-gris-claro);
+  border-radius: 14px;
+  background: #fafafa;
+}
+
+.linea-tiempo__titulo {
+  margin: 4px 0 12px;
+  color: var(--color-texto-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Misma rejilla que cada renglón (columna a favor | barra | columna en
+   contra) para que cada título quede encima de su lado, pegado a la barra. */
+.linea-tiempo__cabecera {
+  display: grid;
+  grid-template-columns: 1fr 2px 1fr;
+  column-gap: 10px;
+  margin-bottom: 6px;
+}
+
+.linea-tiempo__cabecera-col {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.linea-tiempo__cabecera-col--favor {
+  grid-column: 1;
+  text-align: right;
+  color: var(--color-rojo-oscuro);
+}
+
+.linea-tiempo__cabecera-col--contra {
+  grid-column: 3;
+  color: var(--color-azul-oscuro);
+}
+
+.linea-tiempo__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 480px;
+  overflow-y: auto;
+  /* Hueco de la barra de scroll a ambos lados: así el centro de la lista
+     coincide con el de la cabecera y el eje central queda bajo "A favor"/"En contra". */
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Rejilla de tres columnas: a favor | barra | en contra. Cada burbuja se
+   coloca en su columna y se pega a la barra, así todas salen de ella; el
+   orden de arriba a abajo sigue siendo el cronológico entrelazando ambas. */
+.linea-tiempo__renglon {
+  display: grid;
+  grid-template-columns: 1fr 2px 1fr;
+}
+
+.linea-tiempo__fila {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--color-gris-claro);
+  background: #fff;
+}
+
+/* A favor: a la izquierda, con el minuto y el borde de color junto a la barra. */
+.linea-tiempo__renglon--favor .linea-tiempo__fila {
+  grid-column: 1;
+  justify-self: end;
+  flex-direction: row-reverse;
+  border-right: 3px solid var(--color-rojo);
+  border-radius: 8px 0 0 8px;
+  text-align: right;
+}
+
+/* En contra: a la derecha, espejo del lado a favor. */
+.linea-tiempo__renglon--contra .linea-tiempo__fila {
+  grid-column: 3;
+  justify-self: start;
+  border-left: 3px solid var(--color-azul);
+  border-radius: 0 8px 8px 0;
+  text-align: left;
+}
+
+.linea-tiempo__tiempo {
+  flex: 0 0 auto;
+  color: var(--color-texto-suave);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.linea-tiempo__titulo-accion {
+  flex: 1;
+  color: var(--color-texto);
+  font-size: 0.85rem;
+}

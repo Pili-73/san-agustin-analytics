@@ -10,6 +10,7 @@ import EstadoCarga from "../piezas/comun/EstadoCarga";
 import AvisoSinConexion from "../piezas/comun/AvisoSinConexion";
 import PanelEquipo from "../piezas/analisis/PanelEquipo";
 import FiltroTiempo from "../piezas/analisis/FiltroTiempo";
+import LineaTiempo from "../piezas/analisis/LineaTiempo";
 import "../estilos/Estadisticas.css";
 
 async function cargarCabecera(partidoId) {
@@ -68,6 +69,10 @@ export default function Estadisticas() {
           catalogoDefensa={opciones.catalogoPorContexto.DEF}
         />
         <FiltroTiempo rango={rango} onChange={setRango} maxMinutos={hoja.maxMinutos} />
+        <LineaTiempo
+          acciones={hoja.accionesCronologicas || []}
+          catalogoPorContexto={opciones.catalogoPorContexto}
+        />
       </EstadoCarga>
     </div>
   );
