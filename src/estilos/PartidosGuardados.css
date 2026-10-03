@@ -94,6 +94,15 @@
   content: "📍 ";
 }
 
+/* Resultado (nuestros goles - los del rival), debajo del lugar. */
+.marcador-partido {
+  grid-column: 1;
+  color: var(--color-texto);
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
 .ficha-partido time {
   grid-column: 2;
   color: var(--color-rojo-oscuro);

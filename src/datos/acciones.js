@@ -37,3 +37,21 @@ export async function listarAccionesPartidos(partidoIds) {
   const vivas = acciones.filter((accion) => !borradosPorPartido.get(accion.id_partido)?.has(accion.id_accion));
   return [...vivas, ...partidoIds.flatMap((id) => accionesPendientes(id))];
 }
+
+// Marcador de cada partido de la lista, para las fichas de "Ver partidos" y
+// "Reanudar partido": el partido no guarda el resultado, se cuenta a partir
+// de los goles anotados (igual que el marcador de Directo al reanudar). Solo
+// incluye los partidos con alguna acción: uno sin empezar no tiene marcador.
+export async function marcadoresPartidos(partidoIds) {
+  const acciones = await listarAccionesPartidos(partidoIds);
+  const marcadores = new Map();
+  for (const accion of acciones) {
+    const marcador = marcadores.get(accion.id_partido) || { favor: 0, contra: 0 };
+    if (accion.gol_parada_fuera === "GOL") {
+      if (accion.at_def_san === "ATQ") marcador.favor += 1;
+      else if (accion.at_def_san === "DEF") marcador.contra += 1;
+    }
+    marcadores.set(accion.id_partido, marcador);
+  }
+  return marcadores;
+}
