@@ -36,6 +36,15 @@ export const FILTROS_SITUACION = [
   { value: "7M", label: "7 m" },
 ];
 
+// Situación numérica de cada acción (campo "igualdad", que añade
+// anotarIgualdad a partir de las exclusiones), desde el punto de vista de
+// Agustinos: en defensa, "Superioridad" es defender con uno más.
+export const FILTROS_IGUALDAD = [
+  { value: "IGU", label: "Igualdad" },
+  { value: "SUP", label: "Superioridad" },
+  { value: "INF", label: "Inferioridad" },
+];
+
 export const FILTROS_DEFENSA = [
   { value: "6:0", label: "6:0" },
   { value: "5:1", label: "5:1" },
@@ -246,7 +255,14 @@ export function calcularHojaCompleta(acciones) {
   const accionesCronologicas = acciones
     .filter((accion) => accion.at_def_san === "ATQ" || accion.at_def_san === "DEF" || accion.at_def_san === "SAN")
     .slice()
-    .sort((a, b) => (minutosDeTiempo(a.tiempo) ?? Infinity) - (minutosDeTiempo(b.tiempo) ?? Infinity));
+    // En el mismo segundo, por orden de anotación (id): el mismo orden que
+    // usa anotarIgualdad, para que una exclusión salga antes que las acciones
+    // a las que ya afecta.
+    .sort(
+      (a, b) =>
+        (minutosDeTiempo(a.tiempo) ?? Infinity) - (minutosDeTiempo(b.tiempo) ?? Infinity) ||
+        (a.id_accion ?? Infinity) - (b.id_accion ?? Infinity)
+    );
 
   return {
     // En bruto (sin agregar), para que "Ver todas las acciones" pueda contar
@@ -260,6 +276,8 @@ export function calcularHojaCompleta(acciones) {
     sanciones: calcularSanciones(acciones),
     desgloseSituacionAtaque: calcularDesglosePorCampo(acciones, "ATQ", "sit_ofensiva", FILTROS_SITUACION),
     desgloseSituacionDefensa: calcularDesglosePorCampo(acciones, "DEF", "sit_ofensiva", FILTROS_SITUACION),
+    desgloseIgualdadAtaque: calcularDesglosePorCampo(acciones, "ATQ", "igualdad", FILTROS_IGUALDAD),
+    desgloseIgualdadDefensa: calcularDesglosePorCampo(acciones, "DEF", "igualdad", FILTROS_IGUALDAD),
     desgloseFormacionAtaque: calcularDesglosePorCampo(acciones, "ATQ", "tipo_def", FILTROS_DEFENSA),
     desgloseFormacionDefensa: calcularDesglosePorCampo(acciones, "DEF", "tipo_def", FILTROS_DEFENSA),
     eficaciaZonasAtaque: calcularEficaciaPorZonas(acciones, "ATQ"),

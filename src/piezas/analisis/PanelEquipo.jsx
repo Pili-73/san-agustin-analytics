@@ -13,6 +13,7 @@ export default function PanelEquipo({ hoja, tituloSanciones, opcionesAtaque, opc
           titulo="ATAQUE"
           resumen={hoja.estadisticasAtaque}
           desgloseSituacion={hoja.desgloseSituacionAtaque}
+          desgloseIgualdad={hoja.desgloseIgualdadAtaque}
           desgloseFormacion={hoja.desgloseFormacionAtaque}
           tituloFormacion="Defensa rival"
           eficaciaZonas={hoja.eficaciaZonasAtaque}
@@ -26,6 +27,7 @@ export default function PanelEquipo({ hoja, tituloSanciones, opcionesAtaque, opc
           titulo="DEFENSA"
           resumen={hoja.estadisticasDefensa}
           desgloseSituacion={hoja.desgloseSituacionDefensa}
+          desgloseIgualdad={hoja.desgloseIgualdadDefensa}
           desgloseFormacion={hoja.desgloseFormacionDefensa}
           tituloFormacion="Defensa propia"
           eficaciaZonas={hoja.eficaciaZonasDefensa}

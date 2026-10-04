@@ -139,6 +139,8 @@ export function usePartidoEnDirecto(partidoId) {
     );
   };
 
+  // Devuelve la fila guardada (con su tiempo y, si se subió, su id_accion)
+  // y si quedó pendiente de subir; o false si no se pudo guardar.
   const guardarAccion = async (accion) => {
     if (!partidoId || guardando) return false;
 
@@ -149,7 +151,7 @@ export function usePartidoEnDirecto(partidoId) {
       aplicarGolSiCorresponde(accion, 1);
       setUltimaAccion({ accion, idAccion: creada.id_accion, idLocal: null });
       mostrarAviso("Acción guardada", "ok");
-      return true;
+      return { accion: { ...payload, id_accion: creada.id_accion }, pendiente: false };
     } catch (err) {
       if (esErrorDeRed(err)) {
         // Sin conexión: se guarda localmente y se sube sola en cuanto vuelva
@@ -159,7 +161,7 @@ export function usePartidoEnDirecto(partidoId) {
         aplicarGolSiCorresponde(accion, 1);
         setUltimaAccion({ accion, idAccion: null, idLocal });
         mostrarAviso("Sin conexión: se guardará cuando vuelva la red", "pendiente");
-        return true;
+        return { accion: payload, pendiente: true };
       }
       console.error("Error creando acción", err);
       mostrarAviso("No se pudo guardar la acción.", "error");
@@ -238,6 +240,7 @@ export function usePartidoEnDirecto(partidoId) {
     avisoId,
     guardando,
     limpiarAviso: () => setAviso(null),
+    mostrarAviso,
     elapsedMs,
     running,
     pendientes,

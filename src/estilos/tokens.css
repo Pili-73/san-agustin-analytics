@@ -29,6 +29,9 @@
 
   --color-amarillo: #efbd24;
 
+  /* Inferioridad numérica (marcador de Directo). */
+  --color-naranja: #e07b12;
+
   --color-texto: #23180f;
   --color-texto-suave: #6a5754;
   /* Blanco cálido, no blanco puro: hace juego con el rojo claro de las

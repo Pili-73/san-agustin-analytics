@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useDatosTemporada } from "./useDatosTemporada";
 import { calcularHojaCompleta, calcularMinutosTemporada, filtrarPorFecha } from "../utils/estadisticas";
+import { anotarIgualdad } from "../utils/exclusiones";
 
 // jugadorId: null para las estadísticas de todo el equipo, o un id para las
 // de un jugador concreto — es la misma página y el mismo cálculo
@@ -9,9 +10,12 @@ import { calcularHojaCompleta, calcularMinutosTemporada, filtrarPorFecha } from 
 export function useEstadisticasTemporada(idEquipo, jugadorId = null, rango = null) {
   const { cargando, error, partidos, acciones, partidoPorId, rangoFechas } = useDatosTemporada(idEquipo);
 
+  // Superioridad/inferioridad de cada acción, partido a partido y antes de
+  // acotar por jugador o por fecha (ver anotarIgualdad).
+  const accionesAnotadas = useMemo(() => anotarIgualdad(acciones), [acciones]);
   const accionesBase = useMemo(
-    () => (jugadorId ? acciones.filter((accion) => accion.id_jugador === jugadorId) : acciones),
-    [acciones, jugadorId]
+    () => (jugadorId ? accionesAnotadas.filter((accion) => accion.id_jugador === jugadorId) : accionesAnotadas),
+    [accionesAnotadas, jugadorId]
   );
   const accionesFiltradas = useMemo(
     () => filtrarPorFecha(accionesBase, partidoPorId, rango),

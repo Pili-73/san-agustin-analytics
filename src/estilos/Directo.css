@@ -26,7 +26,7 @@
 .lista-directo { display: flex; flex-direction: column; }
 .lista-directo h3 { min-height: 18px; margin: 0 0 7px; color: #666; font-size: .74rem; text-transform: uppercase; }
 
-.jugador-directo { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px; margin-bottom: 7px; border-radius: 8px; background: var(--color-rojo); color: #fff; overflow: hidden; transition: opacity 0.15s ease, outline-color 0.1s ease; }
+.jugador-directo { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 2px; margin-bottom: 7px; border-radius: 8px; background: var(--color-rojo); color: #fff; overflow: hidden; transition: opacity 0.15s ease, outline-color 0.1s ease; }
 .jugador-directo--portero { background: var(--color-amarillo); color: #342806; }
 .jugador-directo.is-selected { outline: 3px solid #222; }
 .jugador-directo__nombre { min-width: 0; padding: 9px 6px; border: 0; background: transparent; color: inherit; cursor: pointer; font-family: var(--fuente); font-size: .88rem; font-weight: 700; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -56,6 +56,10 @@
 .tipos-defensa__pill select { min-height: 34px; padding: 0 8px; border: 0; border-radius: 18px; background: #fff; font: 700 .85rem/1 var(--fuente); }
 .tipos-defensa__pill--propia { border-color: var(--color-rojo); color: var(--color-rojo-oscuro); }
 .tipos-defensa__pill--rival { border-color: var(--color-azul); color: var(--color-azul-oscuro); }
+/* Cada tipo de defensa con las exclusiones en curso de ese equipo al lado. */
+.tipos-defensa__lado { display: flex; align-items: center; gap: 6px; }
+.exclusiones-en-curso { display: flex; flex-wrap: wrap; gap: 4px; }
+.exclusiones-en-curso__item { display: inline-flex; align-items: center; gap: 2px; padding: 3px 7px; border-radius: 999px; background: var(--color-gris-claro); color: var(--color-texto); font-size: .8rem; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* flex: 1 en los botones (no un ancho mínimo fijo) para que las tres
    cards siempre quepan exactamente en el ancho del panel, sea cual sea la
@@ -144,6 +148,8 @@
 
 /* --- Menú del cronómetro --- */
 .menu-marcador { display: grid; gap: 8px; }
+/* Motivo por el que se ha abierto solo el menú: reloj parado por una sanción. */
+.menu-marcador__aviso { margin: 0 0 4px; padding: 10px 12px; border-radius: 9px; background: #fdecd8; color: #7a3d00; font-size: .9rem; font-weight: 700; }
 .menu-marcador button { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px; border: 0; border-radius: 9px; background: #f0f0f0; cursor: pointer; font-family: var(--fuente); font-size: .95rem; font-weight: 700; }
 .menu-marcador button span { font-size: 1.1rem; }
 .menu-marcador button:hover { background: #e6e6e6; }
@@ -231,3 +237,10 @@
   .grupo-accion--def { grid-area: 1 / 2 / 2 / 3; }
   .grupo-accion--san { grid-area: 1 / 3 / 2 / 4; }
 }
+
+/* Sanciones de cada jugador en la lista lateral (solo la más grave). Borde
+   blanco y contorno oscuro: así la tarjeta roja se distingue sobre el fondo
+   rojo del jugador y la amarilla sobre el amarillo del portero. */
+.jugador-directo__sanciones { display: flex; align-items: center; gap: 3px; padding: 0 2px; }
+.jugador-directo__sanciones .icono-tarjeta { border-color: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 55%); }
+.jugador-directo__sanciones .icono-2min { font-size: 1rem; }

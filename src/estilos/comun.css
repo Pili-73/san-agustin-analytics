@@ -104,6 +104,8 @@
 .toast--ok { background: rgb(60 127 67 / 85%); }
 .toast--pendiente { background: rgb(239 189 36 / 85%); color: var(--color-texto); }
 .toast--error { background: rgb(179 38 30 / 85%); }
+/* Aviso importante y más largo de leer (p.ej. reloj parado por una sanción): dura más. */
+.toast--aviso { max-width: min(92vw, 520px); background: rgb(224 123 18 / 92%); text-align: center; animation-duration: 5s; }
 
 @keyframes toast-fade {
   0% {
@@ -212,3 +214,8 @@
 .icono-tarjeta--amarillo { background: var(--color-amarillo); }
 .icono-tarjeta--rojo { background: var(--color-rojo); }
 .icono-tarjeta--azul { background: var(--color-azul); }
+
+/* --- Etiqueta de superioridad / inferioridad numérica (marcador de Directo) --- */
+.etiqueta-igualdad { flex: 0 0 auto; padding: 2px 7px; border-radius: 999px; color: #fff; font-size: .7rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; line-height: 1.3; }
+.etiqueta-igualdad--sup { background: var(--color-verde); }
+.etiqueta-igualdad--inf { background: var(--color-naranja); }

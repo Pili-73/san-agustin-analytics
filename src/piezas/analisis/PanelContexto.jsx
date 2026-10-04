@@ -12,6 +12,7 @@ export default function PanelContexto({
   titulo,
   resumen,
   desgloseSituacion,
+  desgloseIgualdad,
   desgloseFormacion,
   tituloFormacion,
   eficaciaZonas,
@@ -37,6 +38,7 @@ export default function PanelContexto({
         variant={variant}
         eficaciaZonas7m={eficaciaZonas7m}
       />
+      <GrupoBarras titulo="Situación numérica" datos={desgloseIgualdad} variant={variant} />
       <GrupoBarras titulo={tituloFormacion} datos={desgloseFormacion} variant={variant} />
       <OtrasAcciones opciones={opciones} acciones={acciones} catalogo={catalogo} />
       <MapaEficacia

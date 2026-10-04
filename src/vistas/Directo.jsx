@@ -10,6 +10,7 @@ import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { formatearTiempo, minutosDeTiempo, msDeTiempo } from "../utils/tiempo";
 import { borrarEstadoDirecto, guardarEstadoDirecto, leerEstadoDirecto } from "../utils/estadoDirecto";
 import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
+import { esExclusionRival, estadoNumerico, exclusionesActivas } from "../utils/exclusiones";
 import BarraMarcador from "../piezas/partido/BarraMarcador";
 import Modal from "../piezas/comun/Modal";
 import Toast from "../piezas/comun/Toast";
@@ -61,6 +62,17 @@ export default function Directo() {
   const [tiempoMuerto, setTiempoMuerto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
   const [errorCarga, setErrorCarga] = useState("");
+  // Sanciones del partido (las nuestras, en Sanciones, y los 2 min del rival,
+  // en ataque): de aquí salen las exclusiones en curso con su cuenta atrás,
+  // la superioridad/inferioridad y los iconos de cada jugador en la lista.
+  const [sanciones, setSanciones] = useState([]);
+  // Motivo por el que se ha abierto solo el menú del cronómetro (reloj
+  // parado por una sanción); null si lo abrió el usuario.
+  const [avisoMenu, setAvisoMenu] = useState(null);
+  // Última acción guardada, para que "Deshacer" revierta también lo que se
+  // hizo solo al guardarla (quitarla de las sanciones, devolver al campo al
+  // jugador que se mandó al banquillo).
+  const ultimaGuardadaRef = useRef(null);
   const { opcionesPorContexto } = useOpcionesAccion(equipo?.id);
 
   useEffect(() => {
@@ -72,9 +84,15 @@ export default function Directo() {
         listarJugadoresEquipo(partidoCargado.id_equipo),
       ]);
       if (!activo) return;
+      // Sin conexión y sin copia guardada se sigue igual (solo faltarían las
+      // sanciones previas); el camino sin snapshot sí necesita las acciones
+      // y vuelve a pedirlas más abajo, fallando como antes.
+      const accionesPartido = await listarAccionesPartido(partidoId).catch(() => null);
+      if (!activo) return;
       setPartido(partidoCargado);
       setEquipo(equipoCargado);
       setJugadores(jugadoresCargados);
+      setSanciones((accionesPartido || []).filter(esSancion));
 
       // Si venimos de consultar Estadísticas, reanudamos el partido tal como estaba.
       const guardado = leerEstadoDirecto(partidoId);
@@ -105,7 +123,7 @@ export default function Directo() {
         // reloj, parte y marcador a partir de lo que ya haya en la base de
         // datos. En un partido sin acciones todavía esto no cambia nada
         // (sigue arrancando en 0:00, 1ª parte, 0-0).
-        const acciones = await listarAccionesPartido(partidoId);
+        const acciones = accionesPartido ?? (await listarAccionesPartido(partidoId));
         if (!activo) return;
         const ultimaAccion = acciones.reduce((actual, accion) => {
           const minutos = minutosDeTiempo(accion.tiempo);
@@ -158,6 +176,9 @@ export default function Directo() {
   );
 
   const jugadorSeleccionado = jugadores.find((jugador) => jugador.id === seleccionado);
+  const exclusiones = exclusionesActivas(sanciones, partidoEnDirecto.elapsedMs);
+  const situacionNumerica = estadoNumerico(exclusiones.agustinos.length, exclusiones.rival.length);
+  const sancionesPorJugador = useMemo(() => iconosSancionPorJugador(sanciones), [sanciones]);
   const esPorteroSeleccionado = jugadorSeleccionado?.posicion?.toLowerCase() === "portero";
   const puedeGuardarLanzamiento = !partidoEnDirecto.guardando;
   const totalPendientes = partidoEnDirecto.pendientes.length + partidoEnDirecto.pendientesBorrado;
@@ -185,6 +206,20 @@ export default function Directo() {
     }
   };
 
+  // Deshace la última acción y lo que se hizo solo al guardarla: si era una
+  // sanción deja de contar, y si mandó a un jugador al banquillo vuelve al
+  // campo (si sigue en el banquillo).
+  const deshacer = async () => {
+    const ultima = ultimaGuardadaRef.current;
+    const deshecha = await partidoEnDirecto.deshacerUltimaAccion();
+    if (!deshecha || !ultima) return;
+    setSanciones((actuales) => actuales.filter((accion) => accion !== ultima.accion));
+    if (ultima.jugadorAlBanquillo != null && banquilloIds.includes(ultima.jugadorAlBanquillo)) {
+      moverJugador(ultima.jugadorAlBanquillo, "banquillo");
+    }
+    ultimaGuardadaRef.current = null;
+  };
+
   const tipoDefPara = (codigo) => {
     if (codigo === "ATQ") return tipoDefRival;
     if (codigo === "DEF") return tipoDefPropio;
@@ -202,7 +237,24 @@ export default function Directo() {
     if (guardada) {
       setSituacion("POS");
       setSeleccionado(null);
-      if (fin === "2MIN") partidoEnDirecto.pausarCronometro();
+      if (esSancion(guardada.accion)) setSanciones((actuales) => [...actuales, guardada.accion]);
+      ultimaGuardadaRef.current = { accion: guardada.accion, jugadorAlBanquillo: null };
+      if (paraElReloj(guardada.accion)) {
+        partidoEnDirecto.pausarCronometro();
+        // Si la sanción es de uno de los nuestros que está en el campo, sale
+        // al banquillo (y se registra su salida para los minutos jugados).
+        // Volver a entrar es manual, con su flecha: puede entrar otro.
+        const jugador =
+          codigo === "SAN" && jugadorSeleccionado && campoIds.includes(jugadorSeleccionado.id) ? jugadorSeleccionado : null;
+        if (jugador) {
+          moverJugador(jugador.id, "campo");
+          ultimaGuardadaRef.current.jugadorAlBanquillo = jugador.id;
+        }
+        const mensaje = mensajeRelojParado(guardada.accion, jugador, guardada.pendiente);
+        partidoEnDirecto.mostrarAviso(mensaje, "aviso");
+        setAvisoMenu(mensaje);
+        setMenuMarcador(true);
+      }
     }
     setGrupoAbierto(null);
   };
@@ -220,6 +272,7 @@ export default function Directo() {
       gol_parada_fuera: resultado,
     });
     if (guardada) {
+      ultimaGuardadaRef.current = { accion: guardada.accion, jugadorAlBanquillo: null };
       setZonaLanz(null);
       setZonaPorteria(null);
       setSituacion("POS");
@@ -414,7 +467,11 @@ export default function Directo() {
         tiempo={formatearTiempo(partidoEnDirecto.elapsedMs)}
         tiempoMuerto={tiempoMuerto}
         parte={parte}
-        onAbrirMenu={() => setMenuMarcador(true)}
+        situacionNumerica={situacionNumerica}
+        onAbrirMenu={() => {
+          setAvisoMenu(null);
+          setMenuMarcador(true);
+        }}
       />
 
       {errorCarga && <p className="estado-carga texto-error">{errorCarga}</p>}
@@ -429,6 +486,7 @@ export default function Directo() {
             seleccionado={seleccionado}
             onSeleccionar={seleccionarJugador}
             onMover={moverJugador}
+            sancionesPorJugador={sancionesPorJugador}
           />
           <div className="plantilla-directo__separador">BANQUILLO</div>
           <ListaJugadores
@@ -438,6 +496,7 @@ export default function Directo() {
             seleccionado={seleccionado}
             onSeleccionar={seleccionarJugador}
             onMover={moverJugador}
+            sancionesPorJugador={sancionesPorJugador}
           />
         </aside>
 
@@ -450,18 +509,24 @@ export default function Directo() {
               onDismiss={partidoEnDirecto.limpiarAviso}
             />
             <div className="tipos-defensa">
-              <label className="tipos-defensa__pill tipos-defensa__pill--propia">
-                D. propia
-                <select value={tipoDefPropio} onChange={(event) => setTipoDefPropio(event.target.value)}>
-                  {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
-                </select>
-              </label>
-              <label className="tipos-defensa__pill tipos-defensa__pill--rival">
-                D. rival
-                <select value={tipoDefRival} onChange={(event) => setTipoDefRival(event.target.value)}>
-                  {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
-                </select>
-              </label>
+              <div className="tipos-defensa__lado">
+                <label className="tipos-defensa__pill tipos-defensa__pill--propia">
+                  D. Agustinos
+                  <select value={tipoDefPropio} onChange={(event) => setTipoDefPropio(event.target.value)}>
+                    {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
+                  </select>
+                </label>
+                <ExclusionesEnCurso exclusiones={exclusiones.agustinos} />
+              </div>
+              <div className="tipos-defensa__lado">
+                <label className="tipos-defensa__pill tipos-defensa__pill--rival">
+                  D. rival
+                  <select value={tipoDefRival} onChange={(event) => setTipoDefRival(event.target.value)}>
+                    {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
+                  </select>
+                </label>
+                <ExclusionesEnCurso exclusiones={exclusiones.rival} />
+              </div>
             </div>
           </div>
 
@@ -498,7 +563,7 @@ export default function Directo() {
                   <button
                     type="button"
                     className="btn-deshacer"
-                    onClick={partidoEnDirecto.deshacerUltimaAccion}
+                    onClick={deshacer}
                     disabled={partidoEnDirecto.guardando}
                   >
                     ↩ Deshacer
@@ -529,6 +594,7 @@ export default function Directo() {
 
       {menuMarcador && <Modal title="Opciones del partido" onClose={() => setMenuMarcador(false)}>
         <div className="menu-marcador">
+          {avisoMenu && <p className="menu-marcador__aviso" role="status">⏸ {avisoMenu}</p>}
           <button type="button" onClick={partidoEnDirecto.running ? partidoEnDirecto.pausarCronometro : partidoEnDirecto.iniciarCronometro}>
             <span aria-hidden="true">{partidoEnDirecto.running ? "⏸" : "▶"}</span>{partidoEnDirecto.running ? "Pausar reloj" : "Iniciar reloj"}
           </button>
@@ -558,7 +624,7 @@ export default function Directo() {
   );
 }
 
-function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar, onMover }) {
+function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar, onMover, sancionesPorJugador }) {
   const enCampo = lista === "campo";
   return (
     <section className="lista-directo">
@@ -576,6 +642,7 @@ function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar,
             <button type="button" className="jugador-directo__nombre" onClick={() => onSeleccionar(jugador.id)}>
               <strong>{jugador.dorsal}</strong>{jugador.nombre} {jugador.apellido}
             </button>
+            <IconosSancion iconos={sancionesPorJugador[jugador.id]} />
             <button
               type="button"
               className="jugador-directo__mover"
@@ -592,6 +659,80 @@ function ListaJugadores({ titulo, lista, jugadores, seleccionado, onSeleccionar,
         <p className="lista-directo__vacia">{enCampo ? "Sube jugadores del banquillo con ↑." : "Sin jugadores en el banquillo."}</p>
       )}
     </section>
+  );
+}
+
+// Acciones que cuentan como sanción en Directo: todas las de Sanciones
+// (siempre de Agustinos) y los 2 min del rival, que se anotan en ataque.
+function esSancion(accion) {
+  return accion.at_def_san === "SAN" || esExclusionRival(accion);
+}
+
+// 2 min (nuestro o del rival), roja y azul paran el reloj; la amarilla no.
+function paraElReloj(accion) {
+  if (esExclusionRival(accion)) return true;
+  return accion.at_def_san === "SAN" && ["2MIN", "ROJA", "AZUL"].includes(accion.fin);
+}
+
+const NOMBRE_SANCION = { "2MIN": "exclusión de 2 min", ROJA: "tarjeta roja", AZUL: "tarjeta azul" };
+
+function mensajeRelojParado(accion, jugadorAlBanquillo, pendiente) {
+  const motivo = esExclusionRival(accion) ? "exclusión de 2 min del rival" : NOMBRE_SANCION[accion.fin];
+  let mensaje = `Tiempo parado: ${motivo}.`;
+  if (jugadorAlBanquillo) mensaje += ` ${jugadorAlBanquillo.nombre} pasa al banquillo.`;
+  if (accion.fin === "ROJA" || accion.fin === "AZUL") {
+    mensaje += " Si el jugador queda excluido 2 min, añade también la exclusión.";
+  }
+  if (pendiente) mensaje += " (Sin conexión: se guardará cuando vuelva la red.)";
+  return mensaje;
+}
+
+// Iconos de sanción de cada jugador en la lista lateral: solo los de la más
+// grave que lleve. Azul > roja > exclusiones de 2 min (uno por cada una) >
+// amarilla. Con una roja da igual en directo si antes tenía amarilla o 2 min.
+function iconosSancionPorJugador(sanciones) {
+  const porJugador = {};
+  for (const accion of sanciones) {
+    if (accion.at_def_san !== "SAN" || !accion.id_jugador) continue;
+    (porJugador[accion.id_jugador] ||= []).push(accion.fin);
+  }
+  const iconos = {};
+  for (const [idJugador, fines] of Object.entries(porJugador)) {
+    if (fines.includes("AZUL")) iconos[idJugador] = ["AZUL"];
+    else if (fines.includes("ROJA")) iconos[idJugador] = ["ROJA"];
+    else if (fines.includes("2MIN")) iconos[idJugador] = fines.filter((fin) => fin === "2MIN");
+    else if (fines.includes("AMARILLA")) iconos[idJugador] = ["AMARILLA"];
+  }
+  return iconos;
+}
+
+const COLOR_TARJETA = { AMARILLA: "amarillo", ROJA: "rojo", AZUL: "azul" };
+
+function IconosSancion({ iconos }) {
+  if (!iconos?.length) return null;
+  return (
+    <span className="jugador-directo__sanciones">
+      {iconos.map((fin, indice) => (
+        <IndicadorAccion key={indice} codigo="SAN" fin={fin} color={COLOR_TARJETA[fin]} />
+      ))}
+    </span>
+  );
+}
+
+// Exclusiones en curso de un equipo, junto a su tipo de defensa: un ✌️ por
+// cada una con lo que le queda. Va con el reloj de juego: si se para el
+// reloj, la cuenta atrás también se para, como en el partido.
+function ExclusionesEnCurso({ exclusiones }) {
+  if (exclusiones.length === 0) return null;
+  return (
+    <span className="exclusiones-en-curso">
+      {exclusiones.map(({ accion, restanteMs }, indice) => (
+        <span key={accion.id_accion ?? `${accion.tiempo}-${indice}`} className="exclusiones-en-curso__item">
+          <span aria-hidden="true">✌️</span>
+          {formatearTiempo(Math.ceil(restanteMs / 1000) * 1000).replace(/^0/, "")}
+        </span>
+      ))}
+    </span>
   );
 }
 

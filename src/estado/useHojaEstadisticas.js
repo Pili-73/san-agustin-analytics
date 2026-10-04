@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { listarAccionesPartido } from "../datos/acciones";
 import { useCargaAsync } from "./useCargaAsync";
 import { supabase } from "../lib/supabase";
+import { anotarIgualdad } from "../utils/exclusiones";
 import { calcularHojaCompleta, calcularMaxMinutos, calcularMinutosJugador, filtrarPorTiempo } from "../utils/estadisticas";
 
 // jugadorId: null para las estadísticas de todo el equipo, o un id para las
@@ -50,9 +51,12 @@ export function useHojaEstadisticas(partidoId, jugadorId = null, rango = null) {
   // filtradas por jugador ni por tiempo), para que la barra de intervalo no
   // cambie de escala al acotar el filtro o al cambiar de jugador.
   const maxMinutos = useMemo(() => calcularMaxMinutos(acciones), [acciones]);
+  // Superioridad/inferioridad de cada acción: sobre el partido entero,
+  // antes de acotar por jugador o por tiempo (ver anotarIgualdad).
+  const accionesAnotadas = useMemo(() => anotarIgualdad(acciones), [acciones]);
   const accionesBase = useMemo(
-    () => (jugadorId ? acciones.filter((accion) => accion.id_jugador === jugadorId) : acciones),
-    [acciones, jugadorId]
+    () => (jugadorId ? accionesAnotadas.filter((accion) => accion.id_jugador === jugadorId) : accionesAnotadas),
+    [accionesAnotadas, jugadorId]
   );
   const accionesFiltradas = useMemo(() => filtrarPorTiempo(accionesBase, rango), [accionesBase, rango]);
   const hoja = useMemo(() => calcularHojaCompleta(accionesFiltradas), [accionesFiltradas]);

@@ -22,6 +22,11 @@ const PASOS = [
     imagen: "/tutorial/paso3-montaje.png",
   },
   {
+    titulo: "Exclusiones, superioridad e inferioridad",
+    texto: "Las exclusiones de Agustinos se anotan con 2 min en Sanciones; las del rival, con 2 min en Ataque (uno por cada jugador suyo excluido). La app para el reloj, manda al banquillo al jugador excluido y lleva la cuenta atrás de cada exclusión: mientras dure, las acciones cuentan como superioridad o inferioridad. Un 4 min se anota como un segundo 2 min al acabar el primero. Roja y azul no quitan jugador: si hay exclusión, añádela también.",
+    pendiente: true,
+  },
+  {
     titulo: "Hoja de estadísticas general y por jugador",
     texto: "Cada partido tiene una hoja de estadísticas general y otra por jugador. Pulsa una fila como \"Posicional\" o un tipo de defensa para desplegar el detalle de esas jugadas.",
     imagen: "/tutorial/paso4-montaje.png",
