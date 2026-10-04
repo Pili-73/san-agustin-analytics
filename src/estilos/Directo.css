@@ -12,6 +12,8 @@
 .marcador--boton { width: 100%; padding: 10px; border: 0; border-radius: 12px; background: transparent; cursor: pointer; }
 .marcador--boton:hover { background: #f7f7f7; }
 .equipo-nombre { font-size: clamp(1rem, 2.1vw, 1.55rem); font-weight: 700; }
+.marcador__equipo { position: relative; }
+.marcador__situacion { position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); }
 .goles, .timer { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; }
 .timer { padding: 0 10px; border-inline: 1px solid #ddd; }
 .marcador__tiempo-muerto { position: absolute; right: 3px; top: -7px; padding: 2px 5px; border-radius: 5px; background: var(--color-rojo-malo); color: #fff; font-size: .7rem; font-weight: 800; }
@@ -51,13 +53,22 @@
 .tipos-defensa-envoltorio { position: relative; }
 .tipos-defensa-envoltorio > .toast { position: absolute; top: 0; left: 0; right: 0; transform: none; text-align: center; }
 
-.tipos-defensa { display: flex; flex-shrink: 0; justify-content: center; gap: 14px; }
+/* Cuatro columnas: [exclusiones Agustinos | D. Agustinos | D. rival |
+   exclusiones rival]. Las pastillas van en el centro con su ancho natural y
+   las exclusiones en curso en las columnas exteriores, de ancho fijo
+   (reparten lo que sobra): aparecer o desaparecer una exclusión no desplaza
+   las pastillas, y en móvil cada pastilla sigue teniendo el ancho que necesita. */
+.tipos-defensa { display: grid; grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr); align-items: center; flex-shrink: 0; column-gap: 6px; }
 .tipos-defensa__pill { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border: 2px solid; border-radius: 24px; font-size: .8rem; font-weight: 700; }
 .tipos-defensa__pill select { min-height: 34px; padding: 0 8px; border: 0; border-radius: 18px; background: #fff; font: 700 .85rem/1 var(--fuente); }
 .tipos-defensa__pill--propia { border-color: var(--color-rojo); color: var(--color-rojo-oscuro); }
 .tipos-defensa__pill--rival { border-color: var(--color-azul); color: var(--color-azul-oscuro); }
 /* Cada tipo de defensa con las exclusiones en curso de ese equipo al lado. */
-.tipos-defensa__lado { display: flex; align-items: center; gap: 6px; }
+.tipos-defensa__lado { display: contents; }
+.tipos-defensa__pill--propia { grid-column: 2; margin-right: 4px; }
+.tipos-defensa__pill--rival { grid-column: 3; margin-left: 4px; }
+.tipos-defensa__lado--agustinos .exclusiones-en-curso { grid-column: 1; justify-self: end; justify-content: flex-end; }
+.tipos-defensa__lado--rival .exclusiones-en-curso { grid-column: 4; justify-self: start; }
 .exclusiones-en-curso { display: flex; flex-wrap: wrap; gap: 4px; }
 .exclusiones-en-curso__item { display: inline-flex; align-items: center; gap: 2px; padding: 3px 7px; border-radius: 999px; background: var(--color-gris-claro); color: var(--color-texto); font-size: .8rem; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
@@ -150,7 +161,9 @@
 .menu-marcador { display: grid; gap: 8px; }
 /* Motivo por el que se ha abierto solo el menú: reloj parado por una sanción. */
 .menu-marcador__aviso { margin: 0 0 4px; padding: 10px 12px; border-radius: 9px; background: #fdecd8; color: #7a3d00; font-size: .9rem; font-weight: 700; }
-.menu-marcador button { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px; border: 0; border-radius: 9px; background: #f0f0f0; cursor: pointer; font-family: var(--fuente); font-size: .95rem; font-weight: 700; }
+/* text-align a la izquierda: un texto largo que se parte en dos líneas
+   (p.ej. "Timeout" + nombre largo del rival) no debe quedar centrado. */
+.menu-marcador button { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 16px; text-align: left; border: 0; border-radius: 9px; background: #f0f0f0; cursor: pointer; font-family: var(--fuente); font-size: .95rem; font-weight: 700; }
 .menu-marcador button span { font-size: 1.1rem; }
 .menu-marcador button:hover { background: #e6e6e6; }
 .menu-marcador__parte { background: var(--color-azul-claro); color: var(--color-azul-oscuro); }
@@ -163,6 +176,10 @@
      misma fila con el reparto de columnas normal, sin forzar el marcador a
      ocupar toda la fila (eso empujaba "1ª parte" a una fila aparte). */
   .marcador-bar { grid-template-columns: auto 1fr; padding: 8px clamp(10px, 3vw, 20px); }
+  /* Sin sitio a la izquierda del nombre (pisaría "1ª/2ª parte"): la etiqueta
+     de superioridad/inferioridad pasa a ser un distintivo encima del nombre,
+     como el "TM" del tiempo muerto. */
+  .marcador__situacion { right: auto; left: 0; top: -15px; transform: none; padding: 0 5px; font-size: .58rem; }
   .marcador-bar__ayuda { display: none; }
 
   /* El móvil también debe caber entero en la pantalla: mismo mecanismo que
@@ -170,9 +187,11 @@
      compactos (menos hueco, letra más pequeña) para que quepa todo. */
   .directo__contenido { grid-template-columns: minmax(120px, 32%) 1fr; }
   .panel-directo { gap: 8px; padding: 8px; }
-  .tipos-defensa { gap: 8px; }
-  .tipos-defensa__pill { padding: 4px 6px 4px 10px; font-size: .72rem; }
-  .tipos-defensa__pill select { min-height: 28px; }
+  .tipos-defensa { column-gap: 4px; }
+  /* Más compactas: "D. Agustinos" es largo y las dos pastillas tienen que
+     caber juntas en la columna del panel. */
+  .tipos-defensa__pill { gap: 4px; padding: 4px 4px 4px 8px; font-size: .72rem; }
+  .tipos-defensa__pill select { min-height: 28px; padding: 0 2px; }
   .acciones-lanzamiento { gap: 8px; }
   .acciones-lanzamiento button { min-height: 38px; font-size: .88rem; }
   /* En móvil el ancho manda y el alto sale del aspect-ratio (al revés que en

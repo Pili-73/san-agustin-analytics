@@ -104,8 +104,6 @@
 .toast--ok { background: rgb(60 127 67 / 85%); }
 .toast--pendiente { background: rgb(239 189 36 / 85%); color: var(--color-texto); }
 .toast--error { background: rgb(179 38 30 / 85%); }
-/* Aviso importante y más largo de leer (p.ej. reloj parado por una sanción): dura más. */
-.toast--aviso { max-width: min(92vw, 520px); background: rgb(224 123 18 / 92%); text-align: center; animation-duration: 5s; }
 
 @keyframes toast-fade {
   0% {

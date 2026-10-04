@@ -4,7 +4,7 @@
 // (tiene `fin`). Ambos comparten `at_def_san`, `sit_ofensiva` y `tipo_def`.
 
 import { minutosDeTiempo } from "./tiempo";
-import { FIN_POR_CLAVE } from "./categoriasAccion";
+import { FIN_POR_CLAVE, ladoTiempoMuerto } from "./categoriasAccion";
 
 // Filtra por el minuto de partido en el que se registró cada acción (según
 // su `tiempo`, "mm:ss"). rango es [inicio, fin] en minutos, o null para no
@@ -249,11 +249,14 @@ export function calcularHojaCompleta(acciones) {
   // (antes se filtraba dos veces con el mismo predicado).
   const acciones7m = acciones.filter((accion) => accion.sit_ofensiva === "7M");
 
-  // Ataque + defensa + sanciones, ordenadas por minuto:segundo, para la
-  // línea del tiempo de la hoja de estadísticas (se dejan fuera los
-  // marcadores de sustitución/fin de parte: no son jugadas que revisar).
+  // Ataque + defensa + sanciones + tiempos muertos, ordenadas por
+  // minuto:segundo, para la línea del tiempo de la hoja de estadísticas (se
+  // dejan fuera las entradas/salidas y los marcadores de fin de parte).
   const accionesCronologicas = acciones
-    .filter((accion) => accion.at_def_san === "ATQ" || accion.at_def_san === "DEF" || accion.at_def_san === "SAN")
+    .filter(
+      (accion) =>
+        accion.at_def_san === "ATQ" || accion.at_def_san === "DEF" || accion.at_def_san === "SAN" || ladoTiempoMuerto(accion)
+    )
     .slice()
     // En el mismo segundo, por orden de anotación (id): el mismo orden que
     // usa anotarIgualdad, para que una exclusión salga antes que las acciones

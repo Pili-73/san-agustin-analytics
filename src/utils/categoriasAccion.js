@@ -98,3 +98,17 @@ export function describirAccion(accion, catalogoPorContexto = {}) {
 export function contextoAccion(accion) {
   return accion.at_def_san === "DEF" ? "rival" : "agustinos";
 }
+
+// Tiempos muertos: se guardan como sucesos del partido (at_def_san "SUS",
+// igual que el fin de parte o las entradas/salidas), con fin "TMA" si lo
+// pide Agustinos y "TMR" si lo pide el rival. No cuentan en ninguna
+// estadística; solo se muestran en la línea del tiempo.
+export const FIN_TIEMPO_MUERTO = { agustinos: "TMA", rival: "TMR" };
+
+// "agustinos" | "rival" si la acción es un tiempo muerto; null si no.
+export function ladoTiempoMuerto(accion) {
+  if (accion.at_def_san !== "SUS") return null;
+  if (accion.fin === FIN_TIEMPO_MUERTO.agustinos) return "agustinos";
+  if (accion.fin === FIN_TIEMPO_MUERTO.rival) return "rival";
+  return null;
+}

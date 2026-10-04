@@ -250,9 +250,9 @@ export default function Directo() {
           moverJugador(jugador.id, "campo");
           ultimaGuardadaRef.current.jugadorAlBanquillo = jugador.id;
         }
-        const mensaje = mensajeRelojParado(guardada.accion, jugador, guardada.pendiente);
-        partidoEnDirecto.mostrarAviso(mensaje, "aviso");
-        setAvisoMenu(mensaje);
+        // El motivo se muestra en el propio menú del cronómetro, que se abre
+        // solo: no hace falta repetirlo en un aviso flotante.
+        setAvisoMenu(mensajeRelojParado(guardada.accion, jugador, guardada.pendiente));
         setMenuMarcador(true);
       }
     }
@@ -293,9 +293,21 @@ export default function Directo() {
     setEditarTiempo(false);
   };
 
-  const alternarTiempoMuerto = () => {
-    if (!tiempoMuerto) partidoEnDirecto.pausarCronometro();
-    setTiempoMuerto((actual) => !actual);
+  // Empezar un tiempo muerto para el reloj y lo deja anotado (con quién lo
+  // pide) para la línea del tiempo de Estadísticas. El menú se queda
+  // abierto (para ir a Estadísticas o reanudar con "Iniciar reloj"). No hay
+  // botón para terminarlo: termina al volver a iniciar el reloj.
+  const empezarTiempoMuerto = (lado) => {
+    partidoEnDirecto.pausarCronometro();
+    partidoEnDirecto.guardarTiempoMuerto(lado);
+    setTiempoMuerto(true);
+  };
+
+  // Iniciar el reloj termina el tiempo muerto (si lo había) y cierra el
+  // menú, para seguir anotando acciones directamente.
+  const iniciarReloj = () => {
+    partidoEnDirecto.iniciarCronometro();
+    setTiempoMuerto(false);
     setMenuMarcador(false);
   };
 
@@ -509,16 +521,18 @@ export default function Directo() {
               onDismiss={partidoEnDirecto.limpiarAviso}
             />
             <div className="tipos-defensa">
-              <div className="tipos-defensa__lado">
+              {/* Exclusiones de Agustinos a la izquierda de su defensa y las del
+                  rival a la derecha de la suya: cada una hacia su lado. */}
+              <div className="tipos-defensa__lado tipos-defensa__lado--agustinos">
+                <ExclusionesEnCurso exclusiones={exclusiones.agustinos} />
                 <label className="tipos-defensa__pill tipos-defensa__pill--propia">
                   D. Agustinos
                   <select value={tipoDefPropio} onChange={(event) => setTipoDefPropio(event.target.value)}>
                     {TIPOS_DEFENSA.map((tipo) => <option key={tipo}>{tipo}</option>)}
                   </select>
                 </label>
-                <ExclusionesEnCurso exclusiones={exclusiones.agustinos} />
               </div>
-              <div className="tipos-defensa__lado">
+              <div className="tipos-defensa__lado tipos-defensa__lado--rival">
                 <label className="tipos-defensa__pill tipos-defensa__pill--rival">
                   D. rival
                   <select value={tipoDefRival} onChange={(event) => setTipoDefRival(event.target.value)}>
@@ -595,12 +609,19 @@ export default function Directo() {
       {menuMarcador && <Modal title="Opciones del partido" onClose={() => setMenuMarcador(false)}>
         <div className="menu-marcador">
           {avisoMenu && <p className="menu-marcador__aviso" role="status">⏸ {avisoMenu}</p>}
-          <button type="button" onClick={partidoEnDirecto.running ? partidoEnDirecto.pausarCronometro : partidoEnDirecto.iniciarCronometro}>
+          <button type="button" onClick={partidoEnDirecto.running ? partidoEnDirecto.pausarCronometro : iniciarReloj}>
             <span aria-hidden="true">{partidoEnDirecto.running ? "⏸" : "▶"}</span>{partidoEnDirecto.running ? "Pausar reloj" : "Iniciar reloj"}
           </button>
-          <button type="button" onClick={alternarTiempoMuerto}>
-            <span aria-hidden="true">⏱</span>{tiempoMuerto ? "Finalizar tiempo muerto" : "Tiempo muerto"}
-          </button>
+          {!tiempoMuerto && (
+            <>
+              <button type="button" onClick={() => empezarTiempoMuerto("agustinos")}>
+                <span aria-hidden="true">⏱</span>Timeout {equipo?.nombre || "Agustinos"}
+              </button>
+              <button type="button" onClick={() => empezarTiempoMuerto("rival")}>
+                <span aria-hidden="true">⏱</span>Timeout {partido?.rival || "Rival"}
+              </button>
+            </>
+          )}
           <button type="button" onClick={abrirEditarTiempo}>
             <span aria-hidden="true">✎</span>Editar tiempo
           </button>

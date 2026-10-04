@@ -1,4 +1,4 @@
-import { describirAccion, contextoAccion } from "../../utils/categoriasAccion";
+import { describirAccion, contextoAccion, ladoTiempoMuerto } from "../../utils/categoriasAccion";
 import IndicadorAccion from "../comun/IndicadorAccion";
 
 // Todas las acciones del partido (ataque + defensa + sanciones), ordenadas
@@ -20,6 +20,19 @@ export default function LineaTiempo({ acciones, catalogoPorContexto, equipoNombr
       </div>
       <ol className="linea-tiempo__lista">
         {acciones.map((accion) => {
+          // Un tiempo muerto no es una jugada de ningún lado: va como una
+          // línea centrada que cruza las dos columnas.
+          const ladoTM = ladoTiempoMuerto(accion);
+          if (ladoTM) {
+            const equipo = ladoTM === "agustinos" ? equipoNombre || "Agustinos" : rivalNombre || "Rival";
+            return (
+              <li key={accion.id_accion ?? `tm-${accion.tiempo}`} className="linea-tiempo__renglon linea-tiempo__renglon--tiempo-muerto">
+                <span className="linea-tiempo__tiempo-muerto">
+                  <span aria-hidden="true">⏱</span> {accion.tiempo} · Timeout {equipo}
+                </span>
+              </li>
+            );
+          }
           const { titulo, color } = describirAccion(accion, catalogoPorContexto);
           const contexto = contextoAccion(accion);
           return (

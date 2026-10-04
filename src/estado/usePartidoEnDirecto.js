@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { crearAccion, eliminarAccion } from "../datos/acciones";
 import { formatearTiempo } from "../utils/tiempo";
+import { FIN_TIEMPO_MUERTO } from "../utils/categoriasAccion";
 import {
   encolarAccion,
   encolarBorrado,
@@ -193,6 +194,8 @@ export function usePartidoEnDirecto(partidoId) {
 
   const guardarCambioJugador = (idJugador, tipo, tiempo) => guardarSuceso({ id_jugador: idJugador, fin: tipo }, tiempo);
   const guardarMarcadorFin = (tipo, tiempo) => guardarSuceso({ fin: tipo }, tiempo);
+  // lado: "agustinos" | "rival", quién pide el tiempo muerto.
+  const guardarTiempoMuerto = (lado) => guardarSuceso({ fin: FIN_TIEMPO_MUERTO[lado] });
 
   // Deshace solo la última acción (no hay historial de varios pasos): borra
   // la fila si ya se sincronizó, o la quita de la cola si seguía pendiente.
@@ -240,7 +243,6 @@ export function usePartidoEnDirecto(partidoId) {
     avisoId,
     guardando,
     limpiarAviso: () => setAviso(null),
-    mostrarAviso,
     elapsedMs,
     running,
     pendientes,
@@ -255,5 +257,6 @@ export function usePartidoEnDirecto(partidoId) {
     deshacerUltimaAccion,
     guardarCambioJugador,
     guardarMarcadorFin,
+    guardarTiempoMuerto,
   };
 }

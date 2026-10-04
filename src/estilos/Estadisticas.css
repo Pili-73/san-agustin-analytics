@@ -953,6 +953,23 @@
   text-align: left;
 }
 
+/* Tiempo muerto: línea centrada que ocupa las dos columnas. */
+.linea-tiempo__renglon--tiempo-muerto {
+  display: flex;
+  justify-content: center;
+}
+
+.linea-tiempo__tiempo-muerto {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--color-gris-claro);
+  color: var(--color-texto-suave);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
 .linea-tiempo__tiempo {
   flex: 0 0 auto;
   color: var(--color-texto-suave);
