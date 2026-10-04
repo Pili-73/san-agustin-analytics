@@ -134,12 +134,6 @@
 @media (min-width: 761px) {
   .grupo-accion__opciones button { min-height: 48px; padding: 10px 16px; font-size: 1.05rem; }
 }
-/* Iconos de sanción: gesto de 2 dedos (2 min) y tarjeta (amarilla/roja/azul). */
-.icono-2min { flex: 0 0 auto; font-size: 1.15rem; line-height: 1; }
-.icono-tarjeta { width: 11px; height: 15px; flex: 0 0 11px; border: 1px solid #777; border-radius: 2px; }
-.icono-tarjeta--amarillo { background: var(--color-amarillo); }
-.icono-tarjeta--rojo { background: var(--color-rojo); }
-.icono-tarjeta--azul { background: var(--color-azul); }
 
 /* --- Situación ofensiva (7m a media anchura) --- */
 .situaciones { display: grid; flex-shrink: 0; grid-template-columns: repeat(4, 1fr) 0.55fr; gap: 8px; align-items: end; }

@@ -205,3 +205,10 @@
 .indicador-color--amarillo { background: var(--color-amarillo); }
 .indicador-color--azul { background: var(--color-azul); }
 .indicador-color--gris { background: var(--color-gris); }
+
+/* --- Iconos de sanción (Directo y línea del tiempo): gesto de 2 dedos (2 min) y tarjeta (amarilla/roja/azul). */
+.icono-2min { flex: 0 0 auto; font-size: 1.15rem; line-height: 1; }
+.icono-tarjeta { width: 11px; height: 15px; flex: 0 0 11px; border: 1px solid #777; border-radius: 2px; }
+.icono-tarjeta--amarillo { background: var(--color-amarillo); }
+.icono-tarjeta--rojo { background: var(--color-rojo); }
+.icono-tarjeta--azul { background: var(--color-azul); }

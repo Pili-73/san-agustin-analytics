@@ -61,11 +61,11 @@ const RESULTADO_LANZAMIENTO = {
   FUE: { titulo: "Fuera", color: "malo" },
 };
 
-const TITULO_SANCION = {
-  "2MIN": "Exclusión",
-  AMARILLA: "Tarjeta amarilla",
-  ROJA: "Tarjeta roja",
-  AZUL: "Tarjeta azul",
+const SANCIONES = {
+  "2MIN": { titulo: "Exclusión", color: "gris" },
+  AMARILLA: { titulo: "Tarjeta amarilla", color: "amarillo" },
+  ROJA: { titulo: "Tarjeta roja", color: "rojo" },
+  AZUL: { titulo: "Tarjeta azul", color: "azul" },
 };
 
 // Título y color para mostrar una acción individual (p.ej. en la línea del
@@ -82,21 +82,19 @@ export function describirAccion(accion, catalogoPorContexto = {}) {
     return { titulo: `Lanzamiento: ${resultado.titulo}`, color: resultado.color };
   }
   if (accion.at_def_san === "SAN") {
-    return { titulo: TITULO_SANCION[accion.fin] || accion.fin, color: "gris" };
+    return SANCIONES[accion.fin] || { titulo: accion.fin, color: "gris" };
   }
   const catalogo = catalogoPorContexto[accion.at_def_san] || [];
   const opcion = catalogo.find((item) => item.fin === accion.fin);
   return opcion ? { titulo: opcion.titulo, color: opcion.color } : { titulo: accion.fin || "Acción", color: "gris" };
 }
 
-// "favor" | "contra": en qué columna va una acción en la línea del tiempo,
-// para no tener que decirlo con texto. Un lanzamiento o cualquier otra
-// acción de ataque/defensa ya lo dice at_def_san (igual que en Directo.jsx
-// para el marcador: ATQ = nuestro, DEF = del rival). Una sanción no tiene
-// ATQ/DEF propio: id_jugador es siempre de nuestro plantel (no se registra
-// el del rival), así que null significa que la sanción es del rival -a
-// favor nuestro- y con id_jugador es a uno de los nuestros -en contra-.
+// "agustinos" | "rival": en qué columna va una acción en la línea del
+// tiempo, según de quién es la jugada, sea buena o mala. Ataque = jugada
+// de Agustinos; defensa = jugada del rival (su ataque contra nosotros,
+// igual que en Directo.jsx para el marcador). Las sanciones siempre son de
+// Agustinos, con o sin jugador: del rival solo se anotan sus 2 min, y van
+// en el desplegable de ataque.
 export function contextoAccion(accion) {
-  if (accion.at_def_san === "SAN") return accion.id_jugador ? "contra" : "favor";
-  return accion.at_def_san === "DEF" ? "contra" : "favor";
+  return accion.at_def_san === "DEF" ? "rival" : "agustinos";
 }

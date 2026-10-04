@@ -72,6 +72,8 @@ export default function Estadisticas() {
         <LineaTiempo
           acciones={hoja.accionesCronologicas || []}
           catalogoPorContexto={opciones.catalogoPorContexto}
+          equipoNombre={cabecera.equipoNombre}
+          rivalNombre={cabecera.rival}
         />
       </EstadoCarga>
     </div>

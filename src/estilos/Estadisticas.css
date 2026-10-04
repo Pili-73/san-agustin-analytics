@@ -870,29 +870,33 @@
   letter-spacing: 0.05em;
 }
 
-/* Misma rejilla que cada renglón (columna a favor | barra | columna en
-   contra) para que cada título quede encima de su lado, pegado a la barra. */
+/* Misma rejilla que cada renglón (columna de Agustinos | barra | columna
+   del rival) para que cada título quede encima de su lado, pegado a la barra. */
 .linea-tiempo__cabecera {
   display: grid;
-  grid-template-columns: 1fr 2px 1fr;
+  grid-template-columns: minmax(0, 1fr) 2px minmax(0, 1fr);
   column-gap: 10px;
   margin-bottom: 6px;
 }
 
 .linea-tiempo__cabecera-col {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.linea-tiempo__cabecera-col--favor {
+.linea-tiempo__cabecera-col--agustinos {
   grid-column: 1;
   text-align: right;
   color: var(--color-rojo-oscuro);
 }
 
-.linea-tiempo__cabecera-col--contra {
+.linea-tiempo__cabecera-col--rival {
   grid-column: 3;
   color: var(--color-azul-oscuro);
 }
@@ -907,16 +911,16 @@
   max-height: 480px;
   overflow-y: auto;
   /* Hueco de la barra de scroll a ambos lados: así el centro de la lista
-     coincide con el de la cabecera y el eje central queda bajo "A favor"/"En contra". */
+     coincide con el de la cabecera y el eje central queda entre los dos nombres de equipo. */
   scrollbar-gutter: stable both-edges;
 }
 
-/* Rejilla de tres columnas: a favor | barra | en contra. Cada burbuja se
+/* Rejilla de tres columnas: Agustinos | barra | rival. Cada burbuja se
    coloca en su columna y se pega a la barra, así todas salen de ella; el
    orden de arriba a abajo sigue siendo el cronológico entrelazando ambas. */
 .linea-tiempo__renglon {
   display: grid;
-  grid-template-columns: 1fr 2px 1fr;
+  grid-template-columns: minmax(0, 1fr) 2px minmax(0, 1fr);
 }
 
 .linea-tiempo__fila {
@@ -930,8 +934,8 @@
   background: #fff;
 }
 
-/* A favor: a la izquierda, con el minuto y el borde de color junto a la barra. */
-.linea-tiempo__renglon--favor .linea-tiempo__fila {
+/* Agustinos: a la izquierda, con el minuto y el borde de color junto a la barra. */
+.linea-tiempo__renglon--agustinos .linea-tiempo__fila {
   grid-column: 1;
   justify-self: end;
   flex-direction: row-reverse;
@@ -940,8 +944,8 @@
   text-align: right;
 }
 
-/* En contra: a la derecha, espejo del lado a favor. */
-.linea-tiempo__renglon--contra .linea-tiempo__fila {
+/* Rival: a la derecha, espejo del lado de Agustinos. */
+.linea-tiempo__renglon--rival .linea-tiempo__fila {
   grid-column: 3;
   justify-self: start;
   border-left: 3px solid var(--color-azul);

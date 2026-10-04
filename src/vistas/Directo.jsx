@@ -13,6 +13,7 @@ import { ZONAS_LANZAMIENTO } from "../utils/zonasCampo";
 import BarraMarcador from "../piezas/partido/BarraMarcador";
 import Modal from "../piezas/comun/Modal";
 import Toast from "../piezas/comun/Toast";
+import IndicadorAccion from "../piezas/comun/IndicadorAccion";
 import "../estilos/Directo.css";
 
 const SITUACIONES = [
@@ -34,18 +35,6 @@ const GRUPO_SAN = {
 };
 
 const TIPOS_DEFENSA = ["6:0", "5:1", "3:3", "3:2:1"];
-
-// Icono de cada opción: las sanciones usan el gesto de 2 dedos (2 min) o una
-// tarjeta (amarilla/roja/azul); el resto, un círculo de color.
-function IndicadorOpcion({ codigo, fin, color }) {
-  if (codigo === "SAN" && fin === "2MIN") {
-    return <span className="icono-2min" aria-hidden="true">✌️</span>;
-  }
-  if (codigo === "SAN") {
-    return <span className={`icono-tarjeta icono-tarjeta--${color}`} aria-hidden="true" />;
-  }
-  return <span className={`indicador-color indicador-color--${color}`} aria-hidden="true" />;
-}
 
 export default function Directo() {
   const navigate = useNavigate();
@@ -525,7 +514,7 @@ export default function Directo() {
                     <span className="grupo-accion__flecha" aria-hidden="true">{grupoAbierto === grupo.codigo ? "▲" : "▼"}</span>
                   </button>
                   {grupoAbierto === grupo.codigo && <div className="grupo-accion__opciones">
-                    {grupo.opciones.map(([fin, texto, color]) => <button type="button" key={`${grupo.codigo}-${fin}`} onClick={() => guardarEvento(grupo.codigo, fin)} disabled={partidoEnDirecto.guardando}><IndicadorOpcion codigo={grupo.codigo} fin={fin} color={color} /><span className="grupo-accion__texto">{texto}</span></button>)}
+                    {grupo.opciones.map(([fin, texto, color]) => <button type="button" key={`${grupo.codigo}-${fin}`} onClick={() => guardarEvento(grupo.codigo, fin)} disabled={partidoEnDirecto.guardando}><IndicadorAccion codigo={grupo.codigo} fin={fin} color={color} /><span className="grupo-accion__texto">{texto}</span></button>)}
                   </div>}
                 </div>
               ))}
