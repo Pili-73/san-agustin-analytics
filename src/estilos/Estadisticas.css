@@ -362,6 +362,13 @@
   grid-column: 1 / -1;
 }
 
+/* Primera de un grupo de color (verde/gris/rojo): empieza en la primera
+   columna, saltando de fila si hace falta, para que dos colores distintos
+   no compartan fila. En las listas de una sola columna no tiene efecto. */
+.otras-acciones__grid .otras-acciones__item--abre-grupo {
+  grid-column-start: 1;
+}
+
 /* --- Acciones por contexto, en columnas (vista por jugador) --- */
 .acciones-contextos {
   display: grid;

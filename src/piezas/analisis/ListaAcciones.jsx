@@ -1,3 +1,5 @@
+import { compararOpcionesPorColor, grupoColor } from "../../utils/categoriasAccion";
+
 // Los datos de ataque/defensa activos para el equipo (según su
 // Configuración), cada uno con el mismo color que se usa al registrarlo en
 // Directo. Sin contenedor propio: el layout (grid, columnas...) lo pone
@@ -22,23 +24,29 @@ export default function ListaAcciones({ opciones, acciones, catalogo = [] }) {
     return enCatalogo || { id: `extra-${fin}`, fin, titulo: fin, color: "gris" };
   });
 
-  // Agrupadas por color -rojo, luego gris, luego verde-, con el orden
-  // configurado dentro de cada grupo: así una opción fuera de configuración
-  // cae junto a las de su mismo color en vez de siempre al final.
-  const ordenColor = { rojo: 0, gris: 1, verde: 2 };
-  const items = [...opciones, ...extras].sort(
-    (a, b) => (ordenColor[a.color] ?? 1) - (ordenColor[b.color] ?? 1)
-  );
+  // Agrupadas por color -verde, luego gris, luego rojo-, por id dentro de
+  // cada grupo: así una opción fuera de configuración cae junto a las de su
+  // mismo color en vez de siempre al final.
+  const items = [...opciones, ...extras].sort(compararOpcionesPorColor);
 
   return (
     <>
-      {items.map((opcion) => (
-        <div className="otras-acciones__item" key={opcion.id}>
-          <span className={`indicador-color indicador-color--${opcion.color}`} aria-hidden="true" />
-          <strong>{acciones.filter((accion) => accion.fin === opcion.fin).length}</strong>
-          <span>{opcion.titulo}</span>
-        </div>
-      ))}
+      {items.map((opcion, indice) => {
+        // El primero de cada grupo (salvo el primero de todos) arranca fila
+        // nueva en la rejilla de 2 columnas, para no compartir fila con el
+        // último del grupo anterior.
+        const abreGrupo = indice > 0 && grupoColor(opcion) !== grupoColor(items[indice - 1]);
+        return (
+          <div
+            className={`otras-acciones__item ${abreGrupo ? "otras-acciones__item--abre-grupo" : ""}`}
+            key={opcion.id}
+          >
+            <span className={`indicador-color indicador-color--${opcion.color}`} aria-hidden="true" />
+            <strong>{acciones.filter((accion) => accion.fin === opcion.fin).length}</strong>
+            <span>{opcion.titulo}</span>
+          </div>
+        );
+      })}
     </>
   );
 }

@@ -4,6 +4,7 @@ import { obtenerEquipo } from "../datos/equipos";
 import { guardarSeleccionEquipo } from "../datos/opcionesAccion";
 import { useOpcionesAccion } from "../estado/useOpcionesAccion";
 import { useCargaAsync } from "../estado/useCargaAsync";
+import { compararOpcionesPorColor } from "../utils/categoriasAccion";
 import BotonVolver from "../piezas/comun/BotonVolver";
 import EstadoCarga from "../piezas/comun/EstadoCarga";
 import "../estilos/Configuracion.css";
@@ -89,7 +90,7 @@ export default function Configuracion() {
           {["ATQ", "DEF"].map((contexto) => {
             const opciones = catalogo
               .filter((opcion) => opcion.contexto === contexto)
-              .sort((a, b) => a.orden - b.orden);
+              .sort(compararOpcionesPorColor);
             const activas = contarActivas(seleccion, contexto);
 
             return (

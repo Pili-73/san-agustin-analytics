@@ -52,6 +52,22 @@ export const FIN_POR_CLAVE = Object.fromEntries(
   )
 );
 
+// Orden de las opciones de ataque/defensa en Configuración y Estadísticas:
+// verdes arriba, grises en medio y rojos abajo, por id dentro de cada grupo.
+// Cualquier otro color va con los grises; un id no numérico (una acción que
+// ya no está en el catálogo) va al final de su grupo.
+const ORDEN_COLOR = { verde: 0, gris: 1, rojo: 2 };
+
+export function grupoColor(opcion) {
+  return ORDEN_COLOR[opcion.color] ?? ORDEN_COLOR.gris;
+}
+
+export function compararOpcionesPorColor(a, b) {
+  const idA = typeof a.id === "number" ? a.id : Infinity;
+  const idB = typeof b.id === "number" ? b.id : Infinity;
+  return grupoColor(a) - grupoColor(b) || (idA === idB ? 0 : idA < idB ? -1 : 1);
+}
+
 // Resultado de un lanzamiento (accion.gol_parada_fuera) y sanciones
 // (accion.fin dentro de at_def_san "SAN"): códigos fijos, no configurables
 // por equipo, así que no salen del catálogo como el resto de acciones.
